@@ -331,6 +331,10 @@ func ToVectorF(str string) VectorF {
 	return v
 }
 
+func (v VectorF) Sub(offset float64) VectorF {
+	return v.Add(-offset)
+}
+
 func (v VectorF) Add(offset float64) VectorF {
 	result := NewVectorF(len(v))
 	for k := range v {
@@ -450,6 +454,7 @@ func MeanAndVariation(v VectorF) (mean, variance float64) {
 	for i := 0; i < v.Size(); i++ {
 		variance += math.Pow(v[i], 2.0)
 	}
+	variance = variance / float64(v.Size()-1)
 
 	return mean, variance
 }
@@ -469,7 +474,7 @@ func Variance(v VectorF) float64 {
 		result += math.Pow(v[i]-mean, 2.0)
 	}
 
-	return result / float64(v.Size())
+	return result / float64(v.Size()-1)
 
 }
 
@@ -513,15 +518,12 @@ func Sub(A, B VectorF) VectorF {
 
 /// Normalizes with 0 mean, and unit variance
 func (v VectorF) Normalize() VectorF {
-	// 	sigma = std(x);
-	// mu = mean(x);
-	// x(:,2) = (x(:,2) - mu(2))./ sigma(2);
-	// x(:,3) = (x(:,3) - mu(3))./ sigma(3);
+
+	// mean, variance := MeanAndVariation(v)
 	mean := Mean(v)
-	varinc := Variance(v)
-	// fmt.Printf("\n mu  %f, std  %f, Variance:= %f", mean, math.Sqrt(varinc), Variance(v))
-	factor := 1.0 / math.Sqrt(varinc)
-	v = v.Add(-mean)
+	variance := Variance(v)
+	factor := 1.0 / math.Sqrt(variance)
+	v = v.Sub(mean)
 	result := v.ScaleF(factor)
 
 	return result
