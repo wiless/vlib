@@ -123,11 +123,19 @@ func NewVectorF(size int) VectorF {
 	return VectorF(make([]float64, size))
 }
 
+func NewVectorI(size int) VectorI {
+	return VectorI(make([]int, size))
+}
+
 func NewVectorB(size int) VectorB {
 	return VectorB(make([]uint8, size))
 }
 
 func (v Vector) Size() int {
+	return len(v)
+}
+
+func (v VectorI) Size() int {
 	return len(v)
 }
 
@@ -141,12 +149,26 @@ func (v *Vector) Resize(size int) {
 	}
 	///copy(*v, Vector(make([]int, size)))
 }
-func (v *VectorF) ResizeF(size int) {
+
+func (v *VectorF) Resize(size int) {
 	// Only append etc length
 	length := len(*v)
 	extra := (size - length)
 	if extra > 0 {
 		tailvec := NewVectorF(extra)
+		*v = append(*v, tailvec...)
+	}
+
+	///copy(*v, Vector(make([]int, size)))
+
+}
+
+func (v *VectorI) Resize(size int) {
+	// Only append etc length
+	length := len(*v)
+	extra := (size - length)
+	if extra > 0 {
+		tailvec := NewVectorI(extra)
 		*v = append(*v, tailvec...)
 	}
 
@@ -287,7 +309,7 @@ func ToVectorB(str string) VectorB {
 func ToVectorF(str string) VectorF {
 	var v VectorF
 	if strings.Contains(str, ":") {
-		fmt.Printf("Input String : %s ", str)
+		// fmt.Printf("Input String : %s ", str)
 		result := strings.Split(str, ":")
 		start, _ := strconv.ParseFloat(result[0], 64)
 		// start, _ := strconv.ParseFloat(s, bitSize) (result[0])
@@ -320,8 +342,8 @@ func ToVectorF(str string) VectorF {
 			Len = Len
 
 		}
-		v.ResizeF(Len)
-		fmt.Printf("\n %v %v %v %v", start, step, end, Len)
+		v.Resize(Len)
+		// fmt.Printf("\n %v %v %v %v", start, step, end, Len)
 		for k := range v {
 
 			v[k] = start + float64(k)*step
@@ -360,12 +382,39 @@ func (v *VectorF) SelfAddVector(input VectorF) {
 }
 
 func (v VectorF) Insert(pos int, val float64) VectorF {
-
 	result := NewVectorF(v.Size() + 1)
 	copy(result[0:pos], v[0:pos])
 	result[pos] = val
 	copy(result[pos+1:], v[pos:])
 	return result
+}
+
+func (v VectorI) Delete(pos int) VectorI {
+
+	result := NewVectorI(v.Size())
+	copy(result, v)
+	copy(result[pos:], result[pos+1:])
+
+	return result[:v.Size()-1]
+
+}
+func (v VectorF) Delete(pos int) VectorF {
+
+	result := NewVectorF(v.Size())
+	copy(result, v)
+	copy(result[pos:], result[pos+1:])
+
+	// result[v.Size()-1] = nil // or the zero value of T
+
+	return result[:v.Size()-1]
+	// if pos == 0 {
+	// 	copy(result, v[1:pos])
+	// 	return result
+	// }
+	// copy(result[0:pos], v[0:pos])
+	// result[pos] = val
+	// copy(result[pos+1:], v[pos:])
+	// return result
 }
 
 func (v VectorF) AddVector(input VectorF) VectorF {
@@ -527,4 +576,52 @@ func (v VectorF) Normalize() VectorF {
 	result := v.ScaleF(factor)
 
 	return result
+}
+
+func ToVectorI(str string) VectorI {
+	var v VectorI
+	if strings.Contains(str, ":") {
+		fmt.Printf("Input String : %s ", str)
+		result := strings.Split(str, ":")
+		start, _ := strconv.ParseFloat(result[0], 64)
+		// start, _ := strconv.ParseFloat(s, bitSize) (result[0])
+
+		step := 1.0
+		end := start
+		var Len int
+		switch len(result) {
+		case 2:
+			end, _ = strconv.ParseFloat(result[1], 64)
+			Len = int(math.Floor(float64((end - start)) + 1))
+
+		case 3:
+			step, _ = strconv.ParseFloat(result[1], 64)
+			end, _ = strconv.ParseFloat(result[2], 64)
+			diffs := int(math.Abs(float64((end - start) / step)))
+
+			if step < 0 {
+				// tmp := start
+				// start = end
+				// end = tmp
+
+			}
+
+			Len = int(math.Floor(float64(diffs)) + 1)
+
+		}
+
+		if step < 0 {
+			Len = Len
+
+		}
+		v.Resize(Len)
+		// fmt.Printf("\n %v %v %v %v", start, step, end, Len)
+		for k := range v {
+
+			v[k] = int(start + float64(k)*step)
+		}
+
+	}
+	return v
+
 }
