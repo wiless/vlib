@@ -8,10 +8,19 @@ import (
 type Vector []int
 type VectorF []float64
 type VectorB []uint8
+type VectorI []int
 type VectorC []complex128
 
 type VectorIface interface {
 	//	String() string
+}
+
+type Sequence struct {
+	VectorI
+}
+
+func (s *Sequence) Create(str string) {
+	s.VectorI = ToVectorI(str)
 }
 
 // type VectorIface interface{

@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+func init() {
+	fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") /// matlab or octave compatible dump
+}
+
 func ElemMult(in1, in2 Vector) Vector {
 	size := len(in1)
 	result := New(size)
@@ -261,48 +265,6 @@ func ToVectorB(str string) VectorB {
 
 	}
 
-	// if strings.Contains(str, ":") {
-	// 	fmt.Printf("Input String : %s ", str)
-	// 	result := strings.Split(str, ",")
-	// 	start, _ := strconv.ParseFloat(result[0], 64)
-	// 	// start, _ := strconv.ParseFloat(s, bitSize) (result[0])
-
-	// 	step := 1.0
-	// 	end := start
-	// 	var Len int
-	// 	switch len(result) {
-	// 	case 2:
-	// 		end, _ = strconv.ParseFloat(result[1], 64)
-	// 		Len = int(math.Floor(float64((end - start)) + 1))
-
-	// 	case 3:
-	// 		step, _ = strconv.ParseFloat(result[1], 64)
-	// 		end, _ = strconv.ParseFloat(result[2], 64)
-	// 		diffs := int(math.Abs(float64((end - start) / step)))
-
-	// 		if step < 0 {
-	// 			// tmp := start
-	// 			// start = end
-	// 			// end = tmp
-
-	// 		}
-
-	// 		Len = int(math.Floor(float64(diffs)) + 1)
-
-	// 	}
-
-	// 	if step < 0 {
-	// 		Len = Len
-
-	// 	}
-	// 	v.ResizeF(Len)
-	// 	fmt.Printf("\n %v %v %v %v", start, step, end, Len)
-	// 	for k := range v {
-
-	// 		v[k] = start + float64(k)*step
-	// 	}
-
-	// }
 	return result
 }
 
@@ -407,14 +369,7 @@ func (v VectorF) Delete(pos int) VectorF {
 	// result[v.Size()-1] = nil // or the zero value of T
 
 	return result[:v.Size()-1]
-	// if pos == 0 {
-	// 	copy(result, v[1:pos])
-	// 	return result
-	// }
-	// copy(result[0:pos], v[0:pos])
-	// result[pos] = val
-	// copy(result[pos+1:], v[pos:])
-	// return result
+
 }
 
 func (v VectorF) AddVector(input VectorF) VectorF {
@@ -456,26 +411,6 @@ func Flip(input VectorF) VectorF {
 	return result
 }
 
-// func (v VectorB) String() string {
-// 	var str string
-
-// 	size := len(v)
-// 	str = "["
-// 	for i := 0; i < size; i++ {
-// 		if v[i] {
-// 			str += fmt.Sprintf("%d", v[i])
-// 		} else {
-// 			str += " 0 "
-// 		}
-
-// 		if i != size-1 {
-// 			str += " "
-// 		}
-// 	}
-// 	str += "]"
-// 	return str
-// }
-
 func ElemAddCmplx(in1, in2 []complex128) []complex128 {
 	size := len(in1)
 	result := make([]complex128, size)
@@ -497,7 +432,30 @@ func Sum(v VectorF) float64 {
 
 }
 
-func MeanAndVariation(v VectorF) (mean, variance float64) {
+func (v VectorF) ShiftAndScale(shift, scale float64) VectorF {
+
+	// v = v.Add(shift)
+	// result := v.ScaleF(factor)
+
+	result := NewVectorF(v.Size())
+	for i := 0; i < v.Size(); i++ {
+		result[i] = (v[i] + shift) * scale
+	}
+	return result
+}
+func (v VectorF) ScaleAndShift(shift, scale float64) VectorF {
+
+	// v = v.Add(shift)
+	// result := v.ScaleF(factor)
+
+	result := NewVectorF(v.Size())
+	for i := 0; i < v.Size(); i++ {
+		result[i] = v[i]*scale + shift
+	}
+	return result
+}
+
+func MeanAndVariance(v VectorF) (mean, variance float64) {
 	mean = Sum(v) / float64(v.Size())
 	variance = 0
 	for i := 0; i < v.Size(); i++ {
@@ -566,22 +524,22 @@ func Sub(A, B VectorF) VectorF {
 }
 
 /// Normalizes with 0 mean, and unit variance
-func (v VectorF) Normalize() VectorF {
+func (v VectorF) Normalize() (result VectorF, mean, factor float64) {
 
-	// mean, variance := MeanAndVariation(v)
-	mean := Mean(v)
-	variance := Variance(v)
-	factor := 1.0 / math.Sqrt(variance)
-	v = v.Sub(mean)
-	result := v.ScaleF(factor)
+	mean, variance := MeanAndVariance(v)
+	factor = 1.0 / math.Sqrt(variance)
+	result = v.ShiftAndScale(-mean, factor)
 
-	return result
+	// v = v.Sub(mean)
+	// result = v.ScaleF(factor)
+
+	return result, mean, factor
 }
 
 func ToVectorI(str string) VectorI {
 	var v VectorI
 	if strings.Contains(str, ":") {
-		fmt.Printf("Input String : %s ", str)
+		// fmt.Printf("Input String : %s ", str)
 		result := strings.Split(str, ":")
 		start, _ := strconv.ParseFloat(result[0], 64)
 		// start, _ := strconv.ParseFloat(s, bitSize) (result[0])
