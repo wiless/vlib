@@ -230,7 +230,7 @@ func (v Vector) ScaleInt(factor int) Vector {
 	return VectorF
 }
 
-func (v VectorF) ScaleF(factor float64) VectorF {
+func (v VectorF) Scale(factor float64) VectorF {
 
 	VectorF := NewVectorF(len(v))
 	for indx, val := range v {
@@ -239,7 +239,7 @@ func (v VectorF) ScaleF(factor float64) VectorF {
 	return VectorF
 }
 
-func (v Vector) ScaleFloat64(factor float64) VectorF {
+func (v Vector) Scaleloat64(factor float64) VectorF {
 
 	VectorF := NewVectorF(v.Size())
 	for indx, val := range v {
@@ -315,6 +315,10 @@ func ToVectorF(str string) VectorF {
 	return v
 }
 
+func (v VectorF) SubV(rhs VectorF) VectorF {
+	return Sub(v, rhs)
+}
+
 func (v VectorF) Sub(offset float64) VectorF {
 	return v.Add(-offset)
 }
@@ -330,9 +334,9 @@ func (v VectorF) Add(offset float64) VectorF {
 func (v VectorF) Size() int {
 	return len(v)
 }
-func (v *VectorF) SelfAddVector(input VectorF) {
+func (v *VectorF) PlusEqual(input VectorF) {
 	if len(*v) != len(input) {
-		log.Panicf("\n SelfAddVector %d : Length Mismatch %d", v.Size(), input.Size())
+		log.Panicf("\n PlusEqual %d : Length Mismatch %d", v.Size(), input.Size())
 
 	}
 	cnt := v.Size()
@@ -384,6 +388,9 @@ func (v VectorF) AddVector(input VectorF) VectorF {
 }
 
 func Dot(input1 VectorF, input2 VectorF) float64 {
+	if input1.Size() != input2.Size() {
+		log.Panicf("Dot: LHS (%d) RHS (%d) size mismatch", input1.Size(), input2.Size())
+	}
 	temp := ElemMultF(input1, input2)
 	var result float64 = 0.0
 	for _, val := range temp {
@@ -411,18 +418,6 @@ func Flip(input VectorF) VectorF {
 	return result
 }
 
-func ElemAddCmplx(in1, in2 []complex128) []complex128 {
-	size := len(in1)
-	result := make([]complex128, size)
-
-	for i := 0; i < size; i++ {
-		// bool(in1[i])
-		result[i] = in1[i] + in2[i]
-	}
-
-	return result
-}
-
 func Sum(v VectorF) float64 {
 	var result float64
 	for _, val := range v {
@@ -435,7 +430,7 @@ func Sum(v VectorF) float64 {
 func (v VectorF) ShiftAndScale(shift, scale float64) VectorF {
 
 	// v = v.Add(shift)
-	// result := v.ScaleF(factor)
+	// result := v.Scale(factor)
 
 	result := NewVectorF(v.Size())
 	for i := 0; i < v.Size(); i++ {
@@ -446,13 +441,27 @@ func (v VectorF) ShiftAndScale(shift, scale float64) VectorF {
 func (v VectorF) ScaleAndShift(shift, scale float64) VectorF {
 
 	// v = v.Add(shift)
-	// result := v.ScaleF(factor)
+	// result := v.Scale(factor)
 
 	result := NewVectorF(v.Size())
 	for i := 0; i < v.Size(); i++ {
 		result[i] = v[i]*scale + shift
 	}
 	return result
+}
+
+func (v *VectorF) Zeros() {
+	v.Fill(0)
+}
+
+func (v *VectorF) Ones() {
+	v.Fill(1)
+}
+
+func (v *VectorF) Fill(val float64) {
+	for i := 0; i < v.Size(); i++ {
+		(*v)[i] = val
+	}
 }
 
 func MeanAndVariance(v VectorF) (mean, variance float64) {
@@ -466,7 +475,6 @@ func MeanAndVariance(v VectorF) (mean, variance float64) {
 	return mean, variance
 }
 
-/// returns Euclidean Norm of the vector
 func Mean(v VectorF) float64 {
 
 	return Sum(v) / float64(v.Size())
@@ -485,14 +493,24 @@ func Variance(v VectorF) float64 {
 
 }
 
-/// returns Euclidean Norm of the vector
+/// returns the sum of square of the elements in the vector
+func Energy(v VectorF) float64 {
+	var result float64 = 0
+	for i := 0; i < v.Size(); i++ {
+		result += math.Pow(v[i], 2.0)
+	}
+
+	return result
+}
+
+/// returns 2nd Norm of the vector (\sum(x[i]))^(1/2)
 func Norm2(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
 		result += math.Pow(v[i], 2.0)
 	}
 
-	return result / float64(v.Size())
+	return math.Sqrt(result)
 
 }
 
@@ -516,6 +534,9 @@ func Add(A, B VectorF) VectorF {
 }
 
 func Sub(A, B VectorF) VectorF {
+	if A.Size() != B.Size() {
+		log.Panicf("Sub: LHS (%d) and RHS (%d) size mismatch", A.Size(), B.Size())
+	}
 	result := NewVectorF(A.Size())
 	for i := 0; i < A.Size(); i++ {
 		result[i] = A[i] - B[i]
@@ -531,7 +552,7 @@ func (v VectorF) Normalize() (result VectorF, mean, factor float64) {
 	result = v.ShiftAndScale(-mean, factor)
 
 	// v = v.Sub(mean)
-	// result = v.ScaleF(factor)
+	// result = v.Scale(factor)
 
 	return result, mean, factor
 }
