@@ -1,8 +1,8 @@
-package main
+package vlib
 
-import (
-	"fmt"
-)
+// import (
+// // "fmt"
+// )
 
 type CirBuffer struct {
 	Maxlen     int
@@ -11,7 +11,7 @@ type CirBuffer struct {
 	q          []int
 }
 
-func New(n int) *CirBuffer {
+func NewCirBuffer(n int) *CirBuffer {
 	return &CirBuffer{n, 0, -1, true, make([]int, n)}
 }
 
@@ -38,10 +38,4 @@ func (p *CirBuffer) Pop() (value int) {
 	p.q[p.tail%p.Maxlen] = 0
 
 	return value
-}
-
-func main() {
-
-	inputBuffer := New(10)
-
 }

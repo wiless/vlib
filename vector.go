@@ -25,6 +25,18 @@ func ElemMult(in1, in2 Vector) Vector {
 	return result
 }
 
+func (v VectorB) Size() int {
+	return len(v)
+}
+func (v VectorB) ToString() string {
+	var result string
+	size := v.Size()
+	for i := 0; i < size; i++ {
+		result += fmt.Sprintf("%d", v[i])
+	}
+	return result
+}
+
 func (v VectorB) CountErrors(in1 VectorB) int {
 	size := len(v)
 	if size != len(in1) {

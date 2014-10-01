@@ -37,6 +37,13 @@ func ElemMultC(in1, in2 VectorC) VectorC {
 	return result
 }
 
+func (v *VectorC) SetVectorF(input VectorF) {
+	v.Resize(input.Size())
+	for i := 0; i < v.Size(); i++ {
+		(*v)[i] = complex(input[i], 0)
+	}
+}
+
 func NewVectorC(size int) VectorC {
 	return VectorC(make([]complex128, size))
 }
@@ -98,6 +105,19 @@ func (v *VectorC) PlusEqual(input VectorC) {
 
 }
 
+func (v *VectorC) Shift(input VectorC) {
+	if len(*v) != len(input) {
+		log.Panicf("\n PlusEqual %d : Length Mismatch %d", v.Size(), input.Size())
+
+	}
+	cnt := v.Size()
+	for k := 0; k < cnt; k++ {
+
+		(*v)[k] = (*v)[k] + input[k]
+	}
+
+}
+
 func (v VectorC) Insert(pos int, val complex128) VectorC {
 	result := NewVectorC(v.Size() + 1)
 	copy(result[0:pos], v[0:pos])
@@ -127,6 +147,35 @@ func (v VectorC) AddVector(input VectorC) VectorC {
 		result[k] = v[k] + input[k]
 	}
 	return result
+}
+
+func GoDotC(input1 VectorC, input2 VectorC, splitN int) complex128 {
+
+	if input1.Size() != input2.Size() {
+		log.Panicf("Dot: LHS (%d) RHS (%d) size mismatch", input1.Size(), input2.Size())
+	}
+	sublen := input1.Size() / splitN
+	outCH := make(chan complex128, splitN)
+
+	for i := 0; i < splitN; i++ {
+		in1 := input1[i*sublen : sublen*(i+1)]
+		in2 := input2[i*sublen : sublen*(i+1)]
+		// log.Printf("\n Start %d Splitting into %d of each length %d", i*sublen, splitN, sublen)
+		go func(in1, in2 VectorC, outch chan complex128) {
+			temp := ElemMultC(in1, in2)
+			var result complex128 = 0.0
+			for _, val := range temp {
+				result += val
+			}
+			outCH <- result
+		}(in1, in2, outCH)
+	}
+	var sum complex128 = 0
+	for i := 0; i < splitN; i++ {
+		sum += <-outCH
+	}
+
+	return sum
 }
 
 func DotC(input1 VectorC, input2 VectorC) complex128 {
@@ -280,6 +329,15 @@ func SubC(A, B VectorC) VectorC {
 	return result
 }
 
+func (v VectorC) ToUnitEnergy() (result VectorC, factor float64) {
+
+	temp := ElemMultC(v, v)
+	factor = 1.0 / math.Sqrt(cmplx.Abs(SumC(temp)))
+	result = v.Scale(factor)
+
+	return result, factor
+}
+
 /// Normalizes with 0 mean, and unit variance
 func (v VectorC) Normalize() (result VectorC, mean complex128, factor float64) {
 
@@ -291,4 +349,12 @@ func (v VectorC) Normalize() (result VectorC, mean complex128, factor float64) {
 	// result = v.Scale(factor)
 
 	return result, mean, factor
+}
+
+/// Input element is pushed to end of the vector and first element is removed
+func (v VectorC) ShiftLeft(val complex128) VectorC {
+	N := v.Size()
+	result := v.Insert(0, val)
+	return result.Delete(N)
+
 }
