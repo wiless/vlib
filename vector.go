@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-func init() {
-	fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") /// matlab or octave compatible dump
-}
+//func init() {
+//	// fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") /// matlab or octave compatible dump
+//}
 
 func ElemMult(in1, in2 Vector) Vector {
 	size := len(in1)
@@ -28,6 +28,7 @@ func ElemMult(in1, in2 Vector) Vector {
 func (v VectorB) Size() int {
 	return len(v)
 }
+
 func (v VectorB) ToString() string {
 	var result string
 	size := v.Size()
@@ -141,6 +142,15 @@ func NewVectorF(size int) VectorF {
 
 func NewVectorI(size int) VectorI {
 	return VectorI(make([]int, size))
+}
+
+func NewSegmentI(begin, size int) VectorI {
+	var result VectorI
+	result = make([]int, size)
+	for i := 0; i < size; i++ {
+		result[i] = begin + i
+	}
+	return result
 }
 
 func NewVectorB(size int) VectorB {
@@ -356,6 +366,12 @@ func (v *VectorF) PlusEqual(input VectorF) {
 
 		(*v)[k] = (*v)[k] + input[k]
 	}
+
+}
+
+func (v *VectorF) AppendAtEnd(val float64) {
+
+	*v = append(*v, val)
 
 }
 
