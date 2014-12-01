@@ -187,7 +187,7 @@ func WrapAngle(degree0to360 float64) (degreePlusMinus180 float64) {
 }
 
 func ToDegree(radian float64) float64 {
-	return phase * 180.0 / math.Pi
+	return radian * 180.0 / math.Pi
 }
 func ToRadian(degree float64) float64 {
 	return degree * math.Pi / 180.0
