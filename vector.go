@@ -92,6 +92,16 @@ func ElemAddB(in1, in2 VectorB) VectorB {
 
 // func Sum(VectorB) VectorB {
 
+func InvDbF(in1 VectorF) VectorF {
+	size := len(in1)
+
+	for i := 0; i < size; i++ {
+		in1[i] = InvDb(in1[i])
+	}
+
+	return in1
+}
+
 // Does elementwise Multiplication (AND operator) addition between vectors
 func ElemMultB(in1, in2 VectorB) VectorB {
 	size := len(in1)

@@ -18,8 +18,35 @@ import (
 )
 
 // type Complex complex128
+var Origin3D Location3D
+
 type Location3D struct {
 	X, Y, Z float64
+}
+
+func WrapAngle(degree0to360 float64) (degreePlusMinus180 float64) {
+	//degree0to360 = math.Mod(degree0to360, 360)
+	if degree0to360 > 180 {
+		degree := math.Mod(degree0to360, 180)
+		degreePlusMinus180 = -180 + degree
+
+	} else if degree0to360 < -180 {
+		degree := math.Mod(degree0to360, 180)
+		degreePlusMinus180 = 180 + degree
+
+	}
+	log.Println("Input Output", degree0to360, degreePlusMinus180)
+	return degreePlusMinus180
+	// fmt.Println("Origina ", degree)
+	// if degree > 180 {
+	// 	rem := math.Mod(degree, 180.0)
+	// 	degree = -180 + rem
+
+	// } else if degree < -180 {
+	// 	rem := math.Mod(degree, 180.0)
+	// 	//	fmt.Println("Remainder for ", degree, rem)
+	// 	degree = 180 + rem
+	// }
 }
 
 func (l *Location3D) XY() complex128 {

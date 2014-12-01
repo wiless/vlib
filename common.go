@@ -351,10 +351,16 @@ func (m *Matlab) AddText(pos complex128, text string) string {
 }
 
 func (m *Matlab) ExportStruct(keyname string, val interface{}) {
-	str := GenType(keyname, val)
+	mapstruct := GenType(keyname, val)
 	m.Keys = append(m.Keys, keyname)
 	if m.Encoder != nil {
-		err := m.Encoder.Encode(str)
+
+		if reflect.TypeOf(val).Kind() == reflect.Ptr {
+			fmt.Printf("\n ExportStruct %v Type of %v", mapstruct, reflect.TypeOf(val).Kind())
+
+		}
+
+		err := m.Encoder.Encode(mapstruct)
 		m.flushed = false
 		if err != nil {
 			log.Println("Error Writing ", err)
