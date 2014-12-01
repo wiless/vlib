@@ -169,3 +169,26 @@ func Db(linearValue float64) float64 {
 func InvDb(dBValue float64) float64 {
 	return math.Pow(10, dBValue/10.0)
 }
+
+func WrapAngle(degree0to360 float64) (degreePlusMinus180 float64) {
+	//degree0to360 = math.Mod(degree0to360, 360)
+	if degree0to360 > 180 {
+		degree := math.Mod(degree0to360, 180)
+		degreePlusMinus180 = -180 + degree
+
+	} else if degree0to360 < -180 {
+		degree := math.Mod(degree0to360, 180)
+		degreePlusMinus180 = 180 + degree
+
+	}
+	log.Println("Input Output", degree0to360, degreePlusMinus180)
+	return degreePlusMinus180
+
+}
+
+func ToDegree(radian float64) float64 {
+	return phase * 180.0 / math.Pi
+}
+func ToRadian(degree float64) float64 {
+	return degree * math.Pi / 180.0
+}
