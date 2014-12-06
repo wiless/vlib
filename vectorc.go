@@ -90,7 +90,7 @@ func LoadLocationsFromFile(fcsvname, separator string) []Location3D {
 	return result
 }
 
-func ToVectorC(locs []Location3D) VectorC {
+func Location3DtoVecC(locs []Location3D) VectorC {
 	result := NewVectorC(len(locs))
 	for indx, val := range locs {
 		result[indx] = val.Cmplx()
@@ -204,6 +204,22 @@ func ElemMultC(in1, in2 VectorC) VectorC {
 	}
 
 	return result
+}
+
+func ToVectorC(input VectorF) VectorC {
+	v := NewVectorC(input.Size())
+	for i := 0; i < v.Size(); i++ {
+		v[i] = complex(input[i], 0)
+	}
+	return v
+}
+
+func ToVectorC2(re, im VectorF) VectorC {
+	v := NewVectorC(re.Size())
+	for i := 0; i < v.Size(); i++ {
+		v[i] = complex(re[i], im[i])
+	}
+	return v
 }
 
 func (v *VectorC) SetVectorF(input VectorF) {

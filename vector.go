@@ -380,9 +380,25 @@ func (v *VectorF) PlusEqual(input VectorF) {
 }
 
 func (v *VectorF) AppendAtEnd(val float64) {
-
 	*v = append(*v, val)
+}
 
+func (v VectorF) IsEq(vals VectorF) bool {
+	if v.Size() != vals.Size() {
+		return false
+	}
+	for indx, val := range v {
+		if vals[indx] != val {
+			return false
+		}
+
+	}
+	return true
+}
+
+func (v *VectorF) SetSubVec(pos int, vals VectorF) {
+	loc := *v
+	copy(loc[pos:], vals)
 }
 
 func (v VectorF) Insert(pos int, val float64) VectorF {
@@ -463,6 +479,30 @@ func Sum(v VectorF) float64 {
 	}
 	return result
 
+}
+
+func Min(v VectorF) float64 {
+	var result float64
+	if v.Size() < 1 {
+		return math.NaN()
+	}
+	result = v[0]
+	for _, val := range v {
+		result = math.Min(result, val)
+	}
+	return result
+}
+
+func Max(v VectorF) float64 {
+	var result float64
+	if v.Size() < 1 {
+		return math.NaN()
+	}
+	result = v[0]
+	for _, val := range v {
+		result = math.Max(result, val)
+	}
+	return result
 }
 
 func (v VectorF) ShiftAndScale(shift, scale float64) VectorF {

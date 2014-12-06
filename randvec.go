@@ -5,8 +5,9 @@ import (
 	"math/rand"
 )
 
-/// Generates Normal (Gaussian) distributed complex number
 func RandNC(variance float64) complex128 {
+	/// Generates Normal (Gaussian) distributed complex number
+
 	var result complex128
 	var Mean float64 = 0
 	if Mean != 0 && variance != 1 {
@@ -19,7 +20,7 @@ func RandNC(variance float64) complex128 {
 	return result
 }
 
-/// Generates Uniformly (Gaussian) distributed complex number
+/// Generates Uniformly  distributed complex number
 /// Both real and imaginary part are uniformly distributed
 func RandUC(variance float64) complex128 {
 	var result complex128
@@ -31,6 +32,18 @@ func RandUC(variance float64) complex128 {
 	} else {
 		result = complex128(complex(rand.Float64(), rand.Float64()))
 	}
+	return result
+}
+
+/// Generates Uniformly  distributed complex number
+/// Both real and imaginary part are uniformly distributed
+func RandUFVec(size int) []float64 {
+
+	result := NewVectorF(size)
+	for i := 0; i < size; i++ {
+		result[i] = rand.Float64()
+	}
+
 	return result
 }
 
@@ -85,5 +98,37 @@ func RandNFVec(samples int, variance float64) []float64 {
 			result[i] = rand.NormFloat64()
 		}
 	}
+	return result
+}
+
+func RandUMatrix(rows, cols int) MatrixF {
+	result := NewMatrixF(rows, cols)
+	for i := 0; i < rows; i++ {
+		input := RandUFVec(rows)
+
+		result.SetCol(i, input)
+	}
+
+	return result
+}
+
+func RandNMatrix(rows, cols int, variance float64) MatrixF {
+	result := NewMatrixF(rows, cols)
+	for i := 0; i < rows; i++ {
+		input := RandNFVec(rows, variance)
+
+		result.SetCol(i, input)
+	}
+
+	return result
+}
+
+func RandNMatrixC(rows, cols int, variance float64) MatrixC {
+	result := NewMatrixC(rows, cols)
+	for i := 0; i < rows; i++ {
+		input := RandUCVec(rows, variance)
+		result[i] = input
+	}
+
 	return result
 }

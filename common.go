@@ -17,6 +17,9 @@ type VectorB []uint8
 type VectorI []int
 type VectorC []complex128
 
+// type VectorIface interface {
+// }
+
 // MarshalJSON()
 // func (v *VectorF) MarshalJSON() ([]byte, error) {
 // 	str := fmt.Sprintf("x=%f", v)
