@@ -78,6 +78,20 @@ func (m MatrixF) IsEq(val MatrixF) bool {
 	}
 	for i := 0; i < m.NRows(); i++ {
 		if !m[i].IsEq(val[i]) {
+
+			return false
+		}
+	}
+	return true
+}
+
+func (m MatrixC) IsEq(val MatrixC) bool {
+	if m.NRows() != val.NRows() || m.NCols() != val.NCols() {
+		return false
+	}
+	for i := 0; i < m.NRows(); i++ {
+		if !m[i].IsEq(val[i]) {
+			log.Println("\nrow ", i, m[i], "not match", val[i])
 			return false
 		}
 	}
@@ -139,11 +153,27 @@ func (m MatrixF) String() string {
 
 	rows := len(m)
 	// str = "=["
-	str = ""
+	str = "["
 	for i := 0; i < rows; i++ {
 		str += fmt.Sprintf("%f", m[i])
 		if i != rows-1 {
-			str += "\n"
+			str += ",\n"
+		}
+	}
+	str += "]"
+	return str
+}
+
+func (m MatrixC) String() string {
+	var str string
+
+	rows := len(m)
+	// str = "=["
+	str = "["
+	for i := 0; i < rows; i++ {
+		str += fmt.Sprintf("%f", m[i])
+		if i != rows-1 {
+			str += ",\n"
 		}
 	}
 	str += "]"
@@ -486,6 +516,25 @@ func MatchDim(v, m Matrixer) bool {
 	return true
 }
 
+func Resizer(v Matrixer, rows, cols int) {
+
+	r, c := (v).NRows(), (v).NCols()
+
+	if cols < c || rows < r {
+		log.Panicln("Trucation currently not enabled")
+	}
+
+	if rows > r {
+		v.AppendNRows(rows - r)
+
+		if cols > c {
+			v.AppendNCols(cols - c)
+		}
+
+	}
+
+}
+
 /// Resizes the input matrix by either padding zeros or trucating rows/cols as per need
 func Resize(v Matrixer, rows, cols int) Matrixer {
 	var result Matrixer
@@ -551,4 +600,47 @@ func (m MatrixC) NCols() (cols int) {
 }
 func (m MatrixC) Size() (rows, cols int) {
 	return m.NRows(), m.NCols()
+}
+
+func (m *MatrixC) Scale(val float64) {
+	newval := complex(val, 0)
+	m.ScaleC(newval)
+}
+
+func (m *MatrixC) ScaleC(val complex128) {
+	for i := 0; i < m.NRows(); i++ {
+		for j := 0; j < m.NCols(); j++ {
+			(*m)[i][j] *= val
+		}
+	}
+}
+
+// output.Minus(exOutput)
+func (m MatrixC) Minus(val MatrixC) MatrixC {
+
+	if !MatchDim(&m, &val) {
+		return MatrixC{}
+	}
+	result := NewMatrixC(m.NRows(), m.NCols())
+	for i := 0; i < m.NRows(); i++ {
+		for j := 0; j < m.NCols(); j++ {
+			result[i][j] = m[i][j] - val[i][j]
+		}
+	}
+	return result
+}
+
+// output.Minus(exOutput)
+func (m MatrixF) Minus(val MatrixF) MatrixF {
+
+	if !MatchDim(&m, &val) {
+		return MatrixF{}
+	}
+	result := NewMatrixF(m.NRows(), m.NCols())
+	for i := 0; i < m.NRows(); i++ {
+		for j := 0; j < m.NCols(); j++ {
+			result[i][j] = m[i][j] - val[i][j]
+		}
+	}
+	return result
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	ms "github.com/mitchellh/mapstructure"
+	"io/ioutil"
 	"log"
 	"math"
 	"math/cmplx"
@@ -95,6 +97,52 @@ func (p PointA) String() string {
 // 	s.VectorI = ToVectorI(str)
 // }
 
+func Contains(array interface{}, elem interface{}) (found bool, index int) {
+	// if len(array) == 0 {
+	// 	return false, -1
+	// }
+	tOfArray := reflect.TypeOf(array)
+	tOfelem := reflect.TypeOf(elem)
+	if tOfArray.Kind() == reflect.Slice || tOfArray.Kind() == reflect.Array {
+		// fmt.Printf("\n Argument 1 is %s of Types %s ", tOfArray.Kind(), tOfArray.Elem())
+		if tOfArray.Elem() == tOfelem {
+			avalue := reflect.ValueOf(array)
+			evalue := reflect.ValueOf(elem)
+			// fmt.Printf("\n Success : %s : %s : %v", tOfArray.Kind(), tOfelem.Kind(), avalue.Len())
+			// result := false
+			// myarray := reflect.ValueOf(array)
+			for i := 0; i < avalue.Len(); i++ {
+
+				var found bool
+				switch tOfelem.Kind() {
+
+				case reflect.String:
+					found = avalue.Index(i).String() == evalue.String()
+
+				case reflect.Int:
+					found = avalue.Index(i).Int() == evalue.Int()
+
+				case reflect.Float64:
+					found = avalue.Index(i).Float() == evalue.Float()
+				default:
+					log.Panicln("vlib.Contains(): Unsupported ", tOfelem.Kind().String())
+				}
+				// fmt.Println("looking for ", evalue, " IN ", avalue.Index(i), avalue.Index(i).String() == evalue.String())
+				if found {
+					// fmt.Println("Found ")
+					return true, i
+				}
+			}
+			return false, -1
+
+		} else {
+			log.Panicln("Contains : MismatchType :  %v in %v ", elem, array)
+		}
+	}
+
+	return false, -1
+}
+
 func GenType(keyname string, val interface{}) map[string]interface{} {
 	return map[string]interface{}{keyname: val}
 }
@@ -131,6 +179,117 @@ func ToMap(in interface{}) (map[string]interface{}, error) {
 	return out, nil
 }
 
+func LoadMapStructure(fname string, data interface{}) {
+
+	r, ferr := os.Open(fname)
+	if ferr != nil {
+		log.Panicln("LoadMapStructure() : Unable to Open file ", fname)
+	}
+
+	// map[int]
+	type Obj struct {
+		ObjectID interface{}
+		Object   map[string]interface{}
+	}
+	var objs []Obj
+
+	dec := json.NewDecoder(r)
+	derr := dec.Decode(&objs)
+	if derr != nil {
+		log.Panicln("LoadMapStructure():Unale to Decode json data", derr)
+
+	}
+
+	// fmt.Printf("\n Create Map [ %v ] %v  ", reflect.TypeOf(data).Key(), reflect.TypeOf(data).Elem())
+	// vdata = reflect.MapOf(reflect.TypeOf(objs[0]))
+	// fmt.Println("Try to Load array of %v ", reflect.TypeOf(data).Elem())
+	vdata := reflect.ValueOf(data)
+	// fmt.Println("%v ", vdata)
+	for i := 0; i < len(objs); i++ {
+		// fmt.Printf("\n%v : %v ", i, objs[i].Object)
+		key := reflect.ValueOf(objs[i].ObjectID).Convert(reflect.TypeOf(data).Key())
+		// var val reflect.Value
+		val := reflect.Indirect(reflect.New(reflect.TypeOf(data).Elem()))
+		derr := ms.Decode(objs[i].Object, val.Addr().Interface())
+		if derr != nil {
+			log.Panicln("LoadMapStructure() : Unable to Map to Structure")
+		}
+		// fmt.Println("dest obj ", val)
+		// fmt.Println("Map2Str Error ", derr)
+		// fmt.Printf("\n key %v MS : %v to %#v \n", key, objs[i].ObjectID, val.Interface())
+		// fmt.Println("Setting to MAP")
+		// rval := reflect.ValueOf(val)
+		// oldval := vdata.MapIndex(key)
+		// v = make(reflect.Value)0
+		// fmt.Printf("\nOld value in Map %#v", val.Interface())
+
+		vdata.SetMapIndex(key, reflect.Indirect(val))
+	}
+	// mdata := reflect.ValueOf(data)
+	// var cnt int = 0
+	// keys := mdata.MapKeys()
+
+	// objs := make([]Obj, mdata.Len())
+
+	// for _, val := range keys {
+	// 	objs[cnt].ObjectID = val.Interface()
+	// 	objs[cnt].Object = mdata.MapIndex(val).Interface()
+	// 	//	fmt.Printf("\n Key  %v : Value %v", val.Int(), mdata.MapIndex(val))
+	// 	cnt++
+	// }
+	// SaveStructure(objs, fname, formated...)
+	// fmt.Println("\n", objs)
+}
+
+func SaveMapStructure(data interface{}, fname string, formated ...bool) {
+	// map[int]
+	mdata := reflect.ValueOf(data)
+
+	var cnt int = 0
+	keys := mdata.MapKeys()
+
+	type Obj struct {
+		ObjectID interface{}
+		Object   interface{}
+	}
+	objs := make([]Obj, mdata.Len())
+
+	for _, val := range keys {
+		objs[cnt].ObjectID = val.Interface()
+		objs[cnt].Object = mdata.MapIndex(val).Interface()
+		//	fmt.Printf("\n Key  %v : Value %v", val.Int(), mdata.MapIndex(val))
+		cnt++
+	}
+	SaveStructure(objs, fname, formated...)
+	// fmt.Println("\n", objs)
+}
+
+func LoadStructure(fname string, data interface{}) {
+	dbytes, err := ioutil.ReadFile(fname)
+	if err != nil {
+		log.Panicln("Error Reading File  ", fname, err)
+	}
+	// var newsystem deployment.DropSystem
+	jerr := json.Unmarshal(dbytes, data)
+	if jerr != nil {
+		log.Panicln("Unable to UnMarshal ", jerr)
+	}
+}
+
+func GetIntKeys(data interface{}) VectorI {
+	if reflect.TypeOf(data).Kind() != reflect.Map {
+
+	}
+	vdata := reflect.ValueOf(data)
+	result := NewVectorI(vdata.Len())
+	cnt := 0
+	for key, _ := range vdata.MapKeys() {
+		result[cnt] = key
+		cnt++
+	}
+	return result
+}
+
 func SaveStructure(data interface{}, fname string, formated ...bool) {
 	var doFormat bool = true
 	if len(formated) > 0 {
@@ -138,7 +297,6 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 	}
 	output, err := json.Marshal(data)
 	if err != nil {
-		log.Println("Unable to Marshal it : Skip Saving to ", fname)
 		log.Println("Unable to Marshal it : Err ", err)
 		return
 	}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 )
 
 type Matlab struct {
@@ -30,7 +31,11 @@ func (m *Matlab) SetWriter(w io.Writer) {
 }
 
 func (m *Matlab) SetFile(fname string) {
-	m.filename = fname
+	// if strings.HasSuffix(fname, ".m") {
+	fname = strings.TrimSuffix(fname, ".m")
+	// }
+
+	m.filename = fname + ".m"
 	m.datfilename = fname + ".dat"
 	/// Matlab File
 	fd, err := os.Create(m.filename)
@@ -58,8 +63,13 @@ func (m *Matlab) SetDefaults() {
 }
 
 func NewMatlab(fname string) *Matlab {
+
+	// if strings.HasSuffix(fname, ".m") {
+	fname = strings.TrimSuffix(fname, ".m")
+	// }
+
 	result := Matlab{}
-	result.SetFile(fname + ".m")
+	result.SetFile(fname)
 	// result.filename = fname
 	result.Silent = true
 	// fd, err := os.Create(result.filename)

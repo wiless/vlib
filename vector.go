@@ -1,6 +1,7 @@
 package vlib
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -379,16 +380,36 @@ func (v *VectorF) PlusEqual(input VectorF) {
 
 }
 
-func (v *VectorF) AppendAtEnd(val float64) {
-	*v = append(*v, val)
+func (v *VectorF) AppendAtEnd(val ...float64) {
+	// for i := 0; i < len(val); i++ {
+	*v = append(*v, val...)
+	// }
+
+}
+
+func (v *VectorI) AppendAtEnd(val ...int) {
+	// for i := 0; i < len(val); i++ {
+	*v = append(*v, val...)
+	// }
+
 }
 
 func (v VectorF) IsEq(vals VectorF) bool {
 	if v.Size() != vals.Size() {
 		return false
 	}
+
+	var eps float64 = 1.0e-10
+
 	for indx, val := range v {
-		if vals[indx] != val {
+
+		diff := val - vals[indx]
+		errorval := math.Abs(diff)
+		//log.Println("\n ELEMENT ", indx, "error ", errorval)
+		if errorval > eps {
+			// i := indx
+			// log.Println("\nrow ", i, vals[i], "not match", val)
+			//log.Println("\n ELEMENT ", indx, "error ", errorval)
 			return false
 		}
 
@@ -680,5 +701,50 @@ func ToVectorI(str string) VectorI {
 
 	}
 	return v
+
+}
+
+func (c *VectorI) MarshalJSON() ([]byte, error) {
+	//// ParseCVec
+	// var intarray []int
+	// intarray = []int(*c)
+	// res, err := json.Marshal(intarray)
+	var str string
+	for _, val := range *c {
+		str += fmt.Sprintf("%d,", val)
+	}
+
+	str = "[" + strings.TrimSuffix(str, ",") + "]"
+	// fmt.Println("Marshal : VectorI", str)
+	return []byte(str), nil
+	// 	// var str []string
+	// 	// for _, val := range c {
+	// 	// 	str = append(str, fmt.Sprintf("%f%+fi", real(val), imag(val)))
+	// 	// }
+	// 	// result := "\"[" + strings.Join(str, ",") + "]\""
+	// 	// log.Print(" \n JSONING vector ", result)
+	// 	// str := fmt.Sprintf("\"%+g%+gi\"", real(c), imag(c))
+	// 	// return []byte(result), nil
+}
+
+// func (c *VectorI) UnmarshalJSON(databyte []byte) error {
+// 	// ParseCVec
+// 	var floatarray []float64
+// 	err := json.Unmarshal(databyte, floatarray)
+// 	fmt.Println("Unmarshal : VectorI", err, floatarray)
+
+// 	// *c = ParseCVec(string(databyte))
+// 	return err
+
+// }
+
+func (c *VectorI) Decode(databyte []byte) error {
+	// ParseCVec
+	var floatarray []float64
+	err := json.Unmarshal(databyte, floatarray)
+	fmt.Println("Unmarshal : VectorI", err, floatarray)
+
+	// *c = ParseCVec(string(databyte))
+	return err
 
 }

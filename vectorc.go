@@ -151,6 +151,14 @@ func (c Complex) String() string {
 	return str
 }
 
+func (c *Complex) UnmarshalJSON(data []byte) error {
+	var re, im float64
+	str := string(data)
+	fmt.Sscanf(str, "\"%f%fi\"", &re, &im)
+	// fmt.Printf("\nB4 READ : %s %f %f", str, re, im)
+	*c = Complex(complex(re, im))
+	return nil
+}
 func (c VectorC) MarshalJSON() ([]byte, error) {
 	// ParseCVec
 	var str []string
@@ -162,28 +170,11 @@ func (c VectorC) MarshalJSON() ([]byte, error) {
 	// str := fmt.Sprintf("\"%+g%+gi\"", real(c), imag(c))
 	return []byte(result), nil
 }
-
-func (c *Complex) UnmarshalJSON(data []byte) error {
-	var re, im float64
-	str := string(data)
-	fmt.Sscanf(str, "\"%f%fi\"", &re, &im)
-	// fmt.Printf("\nB4 READ : %s %f %f", str, re, im)
-	*c = Complex(complex(re, im))
-	return nil
-}
-
 func (c *VectorC) UnmarshalJSON(databyte []byte) error {
 	// ParseCVec
 	*c = ParseCVec(string(databyte))
 	return nil
-	// var str []string
-	// for _, val := range c {
-	// 	str = append(str, fmt.Sprintf("%g%+gi", real(val), imag(val)))
-	// }
-	// result := "\"[" + strings.Join(str, ",") + "]\""
-	// log.Print(" \n JSONING vector ", result)
-	// // str := fmt.Sprintf("\"%+g%+gi\"", real(c), imag(c))
-	// return []byte(result), nil
+
 }
 
 func Conj(in1 VectorC) VectorC {
@@ -239,6 +230,29 @@ func (v VectorC) AddC(arg complex128) VectorC {
 
 func NewVectorC(size int) VectorC {
 	return VectorC(make([]complex128, size))
+}
+
+func (v VectorC) IsEq(vals VectorC) bool {
+	if v.Size() != vals.Size() {
+		return false
+	}
+
+	var eps float64 = 1.0e-10
+
+	for indx, val := range v {
+
+		diff := val - vals[indx]
+		errorval := cmplx.Abs(diff)
+		//log.Println("\n ELEMENT ", indx, "error ", errorval)
+		if errorval > eps {
+			// i := indx
+			// log.Println("\nrow ", i, vals[i], "not match", val)
+			//	log.Println("\n ELEMENT ", indx, "error ", errorval)
+			return false
+		}
+
+	}
+	return true
 }
 
 func (v *VectorC) Resize(size int) {
@@ -416,6 +430,13 @@ func ElemAddCmplx(in1, in2 []complex128) []complex128 {
 	}
 
 	return result
+}
+
+func (v *VectorC) AppendAtEnd(val ...complex128) {
+	// for i := 0; i < len(val); i++ {
+	*v = append(*v, val...)
+	// }
+
 }
 
 func SumC(v VectorC) complex128 {
