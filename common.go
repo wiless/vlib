@@ -241,27 +241,58 @@ func LoadMapStructure(fname string, data interface{}) {
 	// fmt.Println("\n", objs)
 }
 
-func SaveMapStructure(data interface{}, fname string, formated ...bool) {
+// func SaveMapStructure(data interface{}, fname, keyname, valname string, formated ...bool) {
+// }
+type Obj struct {
+	ObjectID interface{}
+	Object   interface{}
+	keyName  string
+	valname  string
+}
+
+func (o *Obj) init(k, v string) {
+	o.keyName = k
+	o.valname = v
+}
+func (o Obj) MarshalJSON() ([]byte, error) {
+	bfr := bytes.NewBuffer(nil)
+	enc := json.NewEncoder(bfr)
+
+	bfr.WriteString(`{`)
+	bfr.WriteString(fmt.Sprintf(`"%s":`, o.keyName))
+	enc.Encode(o.ObjectID)
+	bfr.WriteString(fmt.Sprintf(`,"%s":`, o.valname))
+	enc.Encode(o.Object)
+	// result := fmt.Sprintf(`"SSKObjectID":%v,"SSKObject":%v`, o.ObjectID, o.Object)
+	bfr.WriteString(`}`)
+	fmt.Printf("%s", bfr.Bytes())
+	return bfr.Bytes(), nil
+}
+
+func SaveMapStructure2(data interface{}, fname, keyname, valname string, formated ...bool) {
 	// map[int]
+
 	mdata := reflect.ValueOf(data)
 
 	var cnt int = 0
 	keys := mdata.MapKeys()
 
-	type Obj struct {
-		ObjectID interface{}
-		Object   interface{}
-	}
 	objs := make([]Obj, mdata.Len())
 
 	for _, val := range keys {
 		objs[cnt].ObjectID = val.Interface()
 		objs[cnt].Object = mdata.MapIndex(val).Interface()
+		objs[cnt].init(keyname, valname)
 		//	fmt.Printf("\n Key  %v : Value %v", val.Int(), mdata.MapIndex(val))
 		cnt++
 	}
 	SaveStructure(objs, fname, formated...)
 	// fmt.Println("\n", objs)
+
+}
+
+func SaveMapStructure(data interface{}, fname string, formated ...bool) {
+	SaveMapStructure2(data, fname, "ObjectID", "Object", formated...)
 }
 
 func LoadStructure(fname string, data interface{}) {

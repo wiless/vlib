@@ -94,13 +94,13 @@ func ElemAddB(in1, in2 VectorB) VectorB {
 // func Sum(VectorB) VectorB {
 
 func InvDbF(in1 VectorF) VectorF {
-	size := len(in1)
 
-	for i := 0; i < size; i++ {
-		in1[i] = InvDb(in1[i])
+	result := NewVectorF(len(in1))
+	for i, val := range in1 {
+		result[i] = InvDb(val)
 	}
 
-	return in1
+	return result
 }
 
 // Does elementwise Multiplication (AND operator) addition between vectors
