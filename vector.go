@@ -187,6 +187,12 @@ func (v *Vector) Resize(size int) {
 	///copy(*v, Vector(make([]int, size)))
 }
 
+func (v VectorF) Clone() VectorF {
+	result := NewVectorF(v.Size())
+	copy(result, v)
+	return result
+}
+
 func (v *VectorF) Resize(size int) {
 	// Only append etc length
 	length := len(*v)
@@ -197,7 +203,6 @@ func (v *VectorF) Resize(size int) {
 	}
 
 	///copy(*v, Vector(make([]int, size)))
-
 }
 
 func (v *VectorI) Resize(size int) {
@@ -367,6 +372,79 @@ func (v VectorF) Add(offset float64) VectorF {
 func (v VectorF) Size() int {
 	return len(v)
 }
+func (v VectorF) Len() int {
+	return v.Size()
+}
+func (v VectorF) Less(i, j int) bool {
+	return v[i] <= v[j]
+
+}
+func (v *VectorF) Swap(i, j int) {
+	(*v)[i], (*v)[j] = (*v)[j], (*v)[i]
+}
+
+func (v VectorF) Find(x float64) int {
+	result := -1
+	for i, val := range v {
+		if x == val {
+			return i
+		}
+	}
+	return result
+}
+
+/// Assumes descending ordered vector
+func (v VectorF) FindSorted(x float64) int {
+	result := -1
+	length := v.Size()
+	for i := (length - 1); i >= 0; i-- {
+
+		val := v[i]
+		if val > x {
+			break
+		}
+		if val == x {
+			return i
+		}
+
+	}
+	return result
+}
+
+func (v VectorF) Get(indx int) float64 {
+	if indx < 0 || indx >= v.Len() {
+		log.Panicln("VectorF::Get() Index out of Bounds.. ")
+	}
+	return v[indx]
+}
+
+func (v VectorF) At(indx VectorI) VectorF {
+
+	result := NewVectorF(v.Size())
+	for i := 0; i < v.Len(); i++ {
+
+		result[i] = v.Get(indx[i])
+	}
+	return result
+}
+
+func (v VectorI) Get(indx int) int {
+	if indx < 0 || indx >= v.Size() {
+		log.Panicln("VectorF::Get() Index out of Bounds.. ")
+	}
+	return v[indx]
+}
+
+func (v VectorI) At(indx VectorI) VectorI {
+
+	result := NewVectorI(v.Size())
+	for i := 0; i < v.Size(); i++ {
+
+		result[i] = v.Get(indx[i])
+	}
+	return result
+}
+
 func (v *VectorF) PlusEqual(input VectorF) {
 	if len(*v) != len(input) {
 		log.Panicf("\n PlusEqual %d : Length Mismatch %d", v.Size(), input.Size())

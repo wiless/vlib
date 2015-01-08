@@ -11,6 +11,7 @@ import (
 	"math/cmplx"
 	"os"
 	"reflect"
+	"sort"
 )
 
 type Vector []int
@@ -196,7 +197,7 @@ func LoadMapStructure(fname string, data interface{}) {
 	dec := json.NewDecoder(r)
 	derr := dec.Decode(&objs)
 	if derr != nil {
-		log.Panicln("LoadMapStructure():Unale to Decode json data", derr)
+		log.Panicln("LoadMapStructure():Unable to Decode json data", derr)
 
 	}
 
@@ -258,15 +259,27 @@ func (o Obj) MarshalJSON() ([]byte, error) {
 	bfr := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(bfr)
 
-	bfr.WriteString(`{`)
+	bfr.WriteString("{")
 	bfr.WriteString(fmt.Sprintf(`"%s":`, o.keyName))
 	enc.Encode(o.ObjectID)
 	bfr.WriteString(fmt.Sprintf(`,"%s":`, o.valname))
+
 	enc.Encode(o.Object)
-	// result := fmt.Sprintf(`"SSKObjectID":%v,"SSKObject":%v`, o.ObjectID, o.Object)
-	bfr.WriteString(`}`)
-	fmt.Printf("%s", bfr.Bytes())
+
+	bfr.WriteString("}")
+
 	return bfr.Bytes(), nil
+}
+
+func (o *Obj) UnmarshalJSON(bfr []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(bfr))
+	temp := make(map[string]interface{})
+	derr := dec.Decode(&temp)
+	log.Println(derr)
+	log.Println("Decoded temp ", temp)
+
+	return nil
 }
 
 func SaveMapStructure2(data interface{}, fname, keyname, valname string, formated ...bool) {
@@ -281,7 +294,9 @@ func SaveMapStructure2(data interface{}, fname, keyname, valname string, formate
 
 	for _, val := range keys {
 		objs[cnt].ObjectID = val.Interface()
+
 		objs[cnt].Object = mdata.MapIndex(val).Interface()
+		// fmt.Printf("\n Creating object %#v", objs[cnt].Object)
 		objs[cnt].init(keyname, valname)
 		//	fmt.Printf("\n Key  %v : Value %v", val.Int(), mdata.MapIndex(val))
 		cnt++
@@ -383,4 +398,25 @@ func ToDegree(radian float64) float64 {
 }
 func ToRadian(degree float64) float64 {
 	return degree * math.Pi / 180.0
+}
+
+func Sorted(data VectorF) (values VectorF, indx VectorI) {
+
+	result := data.Clone()
+
+	sort.Sort(sort.Reverse(sort.Float64Slice(result)))
+	indx = NewVectorI(data.Len())
+	for i, v := range data {
+		indx[i] = result.FindSorted(v)
+
+		// fmt.Printf("\n %v Found %f @ %d ", result, v, indx[i])
+		// 		if indx[i] < len(data) && data[i] == x {
+		// 	// x is present at data[i]
+		// } else {
+		// 	// x is not present in data,
+		// 	// but i is the index where it would be inserted.
+		// }
+
+	}
+	return VectorF(result), indx
 }
