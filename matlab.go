@@ -170,8 +170,10 @@ func (m *Matlab) Flush() {
 		for i := 0; i < len(m.cmdqueue); i++ {
 			m.Command(m.cmdqueue[i])
 		}
-		log.Println("Appending Keys ", m.Keys)
-		m.ExportStruct("Keys", m.Keys)
+		if len(m.Keys) > 0 {
+			log.Println("Appending Keys ", m.Keys)
+			m.ExportStruct("Keys", m.Keys)
+		}
 	}
 	m.flushed = true
 }
