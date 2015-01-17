@@ -46,6 +46,14 @@ func FromVecF(f VectorF) PointA {
 	return p
 }
 
+func GetEJtheta(degree float64) complex128 {
+	return cmplx.Exp(complex(0.0, -degree*math.Pi/180.0))
+}
+
+func Radian(degree float64) float64 {
+	return degree * math.Pi / 180.0
+}
+
 func FromXYVecF(fx, fy VectorF) PointA {
 	if len(fx) != len(fy) {
 		return nil

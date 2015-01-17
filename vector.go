@@ -1,3 +1,5 @@
+// Package vlib provides some trivial functions for vector of int,float64,complex128 and bits. Each corresponding vector is extended
+// from the standard array of data types. Hence it can be type-casted anytime and interface with other libraries
 package vlib
 
 import (
@@ -12,9 +14,13 @@ import (
 )
 
 //func init() {
-//	// fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") /// matlab or octave compatible dump
+//	// fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") // matlab or octave compatible dump
 //}
 
+// ElemMult does element-wise multiplication of vectors in1 and in2
+//
+// Matlab:
+// 	y=in1.*in2
 func ElemMult(in1, in2 Vector) Vector {
 	size := len(in1)
 	result := New(size)
@@ -184,7 +190,7 @@ func (v *Vector) Resize(size int) {
 		tailvec := New(extra)
 		*v = append(*v, tailvec...)
 	}
-	///copy(*v, Vector(make([]int, size)))
+	//copy(*v, Vector(make([]int, size)))
 }
 
 func (v VectorF) Clone() VectorF {
@@ -202,7 +208,7 @@ func (v *VectorF) Resize(size int) {
 		*v = append(*v, tailvec...)
 	}
 
-	///copy(*v, Vector(make([]int, size)))
+	//copy(*v, Vector(make([]int, size)))
 }
 
 func (v *VectorI) Resize(size int) {
@@ -214,7 +220,7 @@ func (v *VectorI) Resize(size int) {
 		*v = append(*v, tailvec...)
 	}
 
-	///copy(*v, Vector(make([]int, size)))
+	//copy(*v, Vector(make([]int, size)))
 
 }
 
@@ -393,7 +399,7 @@ func (v VectorF) Find(x float64) int {
 	return result
 }
 
-/// Assumes descending ordered vector
+// Assumes descending ordered vector
 func (v VectorF) FindSorted(x float64) int {
 	result := -1
 	length := v.Size()
@@ -558,11 +564,11 @@ func Flip(input VectorF) VectorF {
 	size := len(input)
 	result := NewVectorF(size)
 
-	/// short loop method-1
+	// short loop method-1
 	for indx, val := range input {
 		result[size-indx-1] = val
 	}
-	/// short loop method-2
+	// short loop method-2
 	// copy(result, input)
 
 	// for i, j := 0, size-1; i < j; i, j = i+1, j-1 {
@@ -658,7 +664,7 @@ func Mean(v VectorF) float64 {
 
 }
 
-/// returns Euclidean Norm of the vector
+// returns Euclidean Norm of the vector
 func Variance(v VectorF) float64 {
 	var result float64 = 0
 	mean := Mean(v)
@@ -670,7 +676,7 @@ func Variance(v VectorF) float64 {
 
 }
 
-/// returns the sum of square of the elements in the vector
+// returns the sum of square of the elements in the vector
 func Energy(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -680,7 +686,7 @@ func Energy(v VectorF) float64 {
 	return result
 }
 
-/// returns 2nd Norm of the vector (\sum(x[i]))^(1/2)
+// returns 2nd Norm of the vector (\sum(x[i]))^(1/2)
 func Norm2(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -691,7 +697,7 @@ func Norm2(v VectorF) float64 {
 
 }
 
-/// returns Euclidean Norm of the vector
+// returns Euclidean Norm of the vector
 func Norm(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -721,7 +727,7 @@ func Sub(A, B VectorF) VectorF {
 	return result
 }
 
-/// Normalizes with 0 mean, and unit variance
+// Normalizes with 0 mean, and unit variance
 func (v VectorF) Normalize() (result VectorF, mean, factor float64) {
 
 	mean, variance := MeanAndVariance(v)
@@ -783,7 +789,7 @@ func ToVectorI(str string) VectorI {
 }
 
 func (c *VectorI) MarshalJSON() ([]byte, error) {
-	//// ParseCVec
+	/// ParseCVec
 	// var intarray []int
 	// intarray = []int(*c)
 	// res, err := json.Marshal(intarray)

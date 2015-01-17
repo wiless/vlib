@@ -5,8 +5,8 @@ import (
 	"math/rand"
 )
 
+// Generates Normal (Gaussian) distributed complex number
 func RandNC(variance float64) complex128 {
-	/// Generates Normal (Gaussian) distributed complex number
 
 	var result complex128
 	var Mean float64 = 0
@@ -20,8 +20,7 @@ func RandNC(variance float64) complex128 {
 	return result
 }
 
-/// Generates Uniformly  distributed complex number
-/// Both real and imaginary part are uniformly distributed
+// RandUC generates Uniformly  distributed complex number, Both real and imaginary part are uniformly distributed
 func RandUC(variance float64) complex128 {
 	var result complex128
 	var Mean float64 = 0
@@ -35,8 +34,8 @@ func RandUC(variance float64) complex128 {
 	return result
 }
 
-/// Generates Uniformly  distributed complex number
-/// Both real and imaginary part are uniformly distributed
+// Generates Uniformly  distributed complex number
+// Both real and imaginary part are uniformly distributed
 func RandUFVec(size int) VectorF {
 
 	result := NewVectorF(size)
@@ -47,7 +46,7 @@ func RandUFVec(size int) VectorF {
 	return result
 }
 
-/// Generates a complex vector with values uniformly distributed
+// Generates a complex vector with values uniformly distributed
 func RandUCVec(samples int, variance float64) VectorC {
 
 	result := NewVectorC(samples)
@@ -58,7 +57,7 @@ func RandUCVec(samples int, variance float64) VectorC {
 
 }
 
-/// Generates a complex vector with values Normally distributed
+//Generates a complex vector with values Normally distributed
 func RandNCVec(samples int, variance float64) VectorC {
 
 	result := NewVectorC(samples)
@@ -69,6 +68,7 @@ func RandNCVec(samples int, variance float64) VectorC {
 
 }
 
+// RandNF generates  random float values with distribution  N(0,var) - Guassian/Normal
 func RandNF(variance float64) float64 {
 	var result float64
 	var Mean float64 = 0

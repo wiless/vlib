@@ -135,10 +135,10 @@ func RelativeGeo(src, dest Location3D) (distance3d, thetaH, thetaV float64) {
 }
 
 //func init() {
-//	fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") /// matlab or octave compatible dump
+//	fmt.Printf("\n%% === Vlib Initialized : - github.com/wiless ===\n") // matlab or octave compatible dump
 //}
 
-//// Functions for Complex Vectors
+// Complex type for overriding JSON and other parsing
 type Complex complex128
 
 func (c Complex) MarshalJSON() ([]byte, error) {
@@ -185,7 +185,7 @@ func Conj(in1 VectorC) VectorC {
 	return result
 }
 
-//////// Methods over the Complex Vector
+////// Methods over the Complex Vector
 func ElemMultC(in1, in2 VectorC) VectorC {
 	size := len(in1)
 	result := NewVectorC(size)
@@ -264,7 +264,7 @@ func (v *VectorC) Resize(size int) {
 		*v = append(*v, tailvec...)
 	}
 
-	///copy(*v, Vector(make([]int, size)))
+	//copy(*v, Vector(make([]int, size)))
 
 }
 
@@ -459,6 +459,8 @@ func (v VectorC) ShiftAndScale(shift, scale complex128) VectorC {
 	}
 	return result
 }
+
+// ScaleAndShift returns scale*x+shift for the  vector x
 func (v VectorC) ScaleAndShift(shift, scale complex128) VectorC {
 
 	// v = v.Add(shift)
@@ -471,20 +473,27 @@ func (v VectorC) ScaleAndShift(shift, scale complex128) VectorC {
 	return result
 }
 
+// Zeros sets all the elements of the vector to zero
 func (v *VectorC) Zeros() {
 	v.Fill(0)
 }
 
+// Ones sets all the elements of the vector to One
 func (v *VectorC) Ones() {
 	v.Fill(1)
 }
 
+// Fill sets all the elements of the vector to `val`
 func (v *VectorC) Fill(val complex128) {
 	for i := 0; i < v.Size(); i++ {
 		(*v)[i] = val
 	}
 }
 
+// MeanAndVarianceC finds the mean and variance of the vector  <b>v</b>
+/*
+  vlib.MeanAndVariance(v)
+*/
 func MeanAndVarianceC(v VectorC) (mean complex128, variance float64) {
 
 	mean = SumC(v) / complex(float64(v.Size()), 0)
@@ -497,13 +506,14 @@ func MeanAndVarianceC(v VectorC) (mean complex128, variance float64) {
 	return mean, variance
 }
 
+// MeanC returns the mean of the vector v
 func MeanC(v VectorC) complex128 {
 
 	return SumC(v) / complex(float64(v.Size()), 0)
 
 }
 
-/// returns Euclidean Norm of the vector
+// VarianceC calculates the Euclidean Norm i.e (sum(|x[i]-mean|^2))*(1/N-1) of the vector
 func VarianceC(v VectorC) float64 {
 	var result float64 = 0
 	mean := MeanC(v)
@@ -515,7 +525,7 @@ func VarianceC(v VectorC) float64 {
 
 }
 
-/// returns the sum of square of the elements in the vector
+// EnergyC returns the sum of square of the elements sum(|x[i]|^2)) in the vector
 func EnergyC(v VectorC) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -525,7 +535,7 @@ func EnergyC(v VectorC) float64 {
 	return result
 }
 
-/// returns 2nd Norm of the vector (\sum(x[i]))^(1/2)
+// Norm2C returns 2nd Norm of the vector sqrt(sum(|x[i]|^2))
 func Norm2C(v VectorC) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -536,7 +546,7 @@ func Norm2C(v VectorC) float64 {
 
 }
 
-/// returns Euclidean Norm of the vector
+// NormC returns Norm (sum(|x[i]-mean|^2))*(1/N) of the vector
 func NormC(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -547,6 +557,7 @@ func NormC(v VectorF) float64 {
 
 }
 
+// AddC returns the sum of two vectors A and B
 func AddC(A, B VectorC) VectorC {
 	result := NewVectorC(A.Size())
 	for i := 0; i < A.Size(); i++ {
@@ -555,6 +566,7 @@ func AddC(A, B VectorC) VectorC {
 	return result
 }
 
+// AddC returns the Difference (A-B) of two vectors A,B
 func SubC(A, B VectorC) VectorC {
 	if A.Size() != B.Size() {
 		log.Panicf("Sub: LHS (%d) and RHS (%d) size mismatch", A.Size(), B.Size())
@@ -575,7 +587,7 @@ func (v VectorC) ToUnitEnergy() (result VectorC, factor float64) {
 	return result, factor
 }
 
-/// Normalizes with 0 mean, and unit variance
+// Normalizes with 0 mean, and unit variance
 func (v VectorC) Normalize() (result VectorC, mean complex128, factor float64) {
 
 	mean, variance := MeanAndVarianceC(v)
@@ -588,7 +600,7 @@ func (v VectorC) Normalize() (result VectorC, mean complex128, factor float64) {
 	return result, mean, factor
 }
 
-/// Input element is pushed to end of the vector and first element is removed
+// Input element is pushed to end of the vector and first element is removed
 func (v VectorC) ShiftLeft(val complex128) VectorC {
 	N := v.Size()
 	result := v.Insert(0, val)
@@ -634,9 +646,9 @@ func ParseCVec(str string) VectorC {
 			//      FLOAT  // 123.45
 			//      IMAG   // 123.45i
 
-			/// NEW COMPLEX NUMBER
+			// NEW COMPLEX NUMBER
 			if cnt%2 == 0 {
-				/// Real part of complex number
+				// Real part of complex number
 				imagval = 0
 				if tok == token.INT {
 					realval = 0
@@ -699,7 +711,7 @@ func ParseCVec(str string) VectorC {
 
 			cnt++
 			// recentNumber = complex(0, lit)
-			/// Imag part of complex number
+			// Imag part of complex number
 		}
 
 		// fmt.Printf("%s \t %s \t %q \n", fset.Position(pos), tok, lit)
