@@ -664,7 +664,7 @@ func Mean(v VectorF) float64 {
 
 }
 
-// returns Euclidean Norm of the vector
+// Variance returns Norm of the vector
 func Variance(v VectorF) float64 {
 	var result float64 = 0
 	mean := Mean(v)
@@ -676,7 +676,7 @@ func Variance(v VectorF) float64 {
 
 }
 
-// returns the sum of square of the elements in the vector
+// Energy returns the sum of square of the elements in the vector
 func Energy(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -686,7 +686,7 @@ func Energy(v VectorF) float64 {
 	return result
 }
 
-// returns 2nd Norm of the vector (\sum(x[i]))^(1/2)
+// returns 2nd Norm of the vector \Sqrt(sum(|x[i]|^2))
 func Norm2(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
@@ -697,8 +697,8 @@ func Norm2(v VectorF) float64 {
 
 }
 
-// returns Euclidean Norm of the vector
-func Norm(v VectorF) float64 {
+// RMS returns the root-mean-square of the vector
+func RMS(v VectorF) float64 {
 	var result float64 = 0
 	for i := 0; i < v.Size(); i++ {
 		result += math.Pow(v[i], 2.0)
