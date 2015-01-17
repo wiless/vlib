@@ -37,7 +37,7 @@ func RandUC(variance float64) complex128 {
 
 /// Generates Uniformly  distributed complex number
 /// Both real and imaginary part are uniformly distributed
-func RandUFVec(size int) []float64 {
+func RandUFVec(size int) VectorF {
 
 	result := NewVectorF(size)
 	for i := 0; i < size; i++ {
@@ -48,9 +48,9 @@ func RandUFVec(size int) []float64 {
 }
 
 /// Generates a complex vector with values uniformly distributed
-func RandUCVec(samples int, variance float64) []complex128 {
+func RandUCVec(samples int, variance float64) VectorC {
 
-	result := make([]complex128, samples)
+	result := NewVectorC(samples)
 	for i := 0; i < samples; i++ {
 		result[i] = RandUC(variance)
 	}
@@ -59,9 +59,9 @@ func RandUCVec(samples int, variance float64) []complex128 {
 }
 
 /// Generates a complex vector with values Normally distributed
-func RandNCVec(samples int, variance float64) []complex128 {
+func RandNCVec(samples int, variance float64) VectorC {
 
-	result := make([]complex128, samples)
+	result := NewVectorC(samples)
 	for i := 0; i < samples; i++ {
 		result[i] = RandNC(variance)
 	}
@@ -82,9 +82,9 @@ func RandNF(variance float64) float64 {
 	return result
 }
 
-func RandNFVec(samples int, variance float64) []float64 {
+func RandNFVec(samples int, variance float64) VectorF {
 
-	result := make([]float64, samples)
+	result := NewVectorF(samples)
 	var Mean float64 = 0
 	var StdDev float64 = math.Sqrt(variance)
 
