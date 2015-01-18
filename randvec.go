@@ -5,6 +5,44 @@ import (
 	"math/rand"
 )
 
+func Randsrc(size int, maxvalue int) []int {
+	var result = make([]int, size)
+	for i := 0; i < size; i++ {
+		result[i] = rand.Intn(maxvalue)
+	}
+	return result
+}
+
+// RandB generates a vector of N random bits
+func RandB(N int) VectorB {
+	result := NewVectorB(N)
+	for i := 0; i < N; i++ {
+		result[i] = uint8(rand.Intn(2))
+	}
+	return result
+}
+
+// RandReadableChars returns N printable random characters char=32 to 126
+func RandReadableChars(N int) VectorB {
+	/// 32 to 126
+	result := NewVectorB(N)
+	var startChar byte = 32
+	for i := 0; i < N; i++ {
+		result[i] = startChar + uint8(rand.Intn(94))
+	}
+	return result
+}
+
+func RandChars(size int) []uint8 {
+	var result = make([]uint8, size)
+
+	for i := 0; i < size; i++ {
+		result[i] = uint8(rand.Intn(256))
+
+	}
+	return result
+}
+
 // Generates Normal (Gaussian) distributed complex number
 func RandNC(variance float64) complex128 {
 
