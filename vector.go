@@ -161,6 +161,11 @@ func NewVectorI(size int) VectorI {
 	return VectorI(make([]int, size))
 }
 
+// NewSegmentI generates a sequences of index values, for each segment of size "size"
+// Assume of a segment of length 5, then each segment s_i will be
+// 	s_0 = {0, 1 , 2,3,4}
+// 	s_1 = {5,...9}
+// 	s_2 = {10,..14}
 func NewSegmentI(begin, size int) VectorI {
 	var result VectorI
 	result = make([]int, size)
