@@ -22,6 +22,28 @@ func RandB(N int) VectorB {
 	return result
 }
 
+type keypair struct {
+	begin  uint8
+	length int
+}
+
+var splAsciitable [3]keypair = [3]keypair{{48, 10}, {65, 26}, {97, 26}}
+
+// RandString returns N numbers or alphabets
+func RandString(N int) VectorB {
+	// start,end
+	// 48,10 0-9
+	// 65,27 A-Z
+	// 97,26 a-z
+
+	result := NewVectorB(N)
+	for i := 0; i < N; i++ {
+		key := rand.Intn(3)
+		result[i] = splAsciitable[key].begin + uint8(rand.Intn(splAsciitable[key].length))
+	}
+	return result
+}
+
 // RandReadableChars returns N printable random characters char=32 to 126
 func RandReadableChars(N int) VectorB {
 	/// 32 to 126
@@ -48,13 +70,13 @@ func RandNC(variance float64) complex128 {
 
 	var result complex128
 	var Mean float64 = 0
-	if Mean != 0 && variance != 1 {
-		var StdDev float64 = math.Sqrt(variance)
-		result = complex128(complex(rand.NormFloat64()*StdDev+Mean, rand.NormFloat64()*StdDev+Mean))
+	// if Mean != 0 && variance != 1 {
+	var StdDev float64 = math.Sqrt(variance)
+	result = complex128(complex(rand.NormFloat64()*StdDev+Mean, rand.NormFloat64()*StdDev+Mean))
 
-	} else {
-		result = complex128(complex(rand.NormFloat64(), rand.NormFloat64()))
-	}
+	// } else {
+	// 	result = complex128(complex(rand.NormFloat64()*StdDev, rand.NormFloat64()*StdDev))
+	// }
 	return result
 }
 
