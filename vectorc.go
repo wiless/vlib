@@ -40,10 +40,25 @@ func (l *Location3D) Cmplx() complex128 {
 	return complex(l.X, l.Y)
 }
 
-func (l *Location3D) Shift3D(delta Location3D) {
+func (l Location3D) Scale3D(factor float64) Location3D {
+	l.X *= factor
+	l.Y *= factor
+	l.Z *= factor
+	return l
+}
+
+func (l Location3D) Scale(factor float64) Location3D {
+	l.X *= factor
+	l.Y *= factor
+	// l.Z = factor
+	return l
+}
+
+func (l Location3D) Shift3D(delta Location3D) Location3D {
 	l.X += delta.X
 	l.Y += delta.Y
 	l.Z += delta.Z
+	return l
 }
 
 func (l *Location3D) Shift2D(deltaxy complex128) {
@@ -53,6 +68,10 @@ func (l *Location3D) Shift2D(deltaxy complex128) {
 func (l *Location3D) SetLoc(loc2D complex128, height float64) {
 	*l = FromCmplx(loc2D)
 	l.SetHeight(height)
+}
+
+func (l *Location3D) SetLocXYZ(x, y, z float64) {
+	l.X, l.Y, l.Z = x, y, z
 }
 
 func FromVectorC(loc2d VectorC, height float64) []Location3D {

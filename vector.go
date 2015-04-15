@@ -187,6 +187,14 @@ func (v VectorI) Size() int {
 	return len(v)
 }
 
+func (v VectorI) ToVectorF() VectorF {
+	result := NewVectorF(v.Size())
+	for i := 0; i < v.Size(); i++ {
+		result[i] = float64(v[i])
+	}
+	return result
+}
+
 func (v *Vector) Resize(size int) {
 	// Only append etc length
 	length := v.Size()
