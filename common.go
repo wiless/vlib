@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	ms "github.com/mitchellh/mapstructure"
 	"io/ioutil"
 	"log"
 	"math"
@@ -12,6 +11,8 @@ import (
 	"os"
 	"reflect"
 	"sort"
+
+	ms "github.com/mitchellh/mapstructure"
 )
 
 type Vector []int
@@ -284,10 +285,10 @@ func (o *Obj) UnmarshalJSON(bfr []byte) error {
 	dec := json.NewDecoder(bytes.NewReader(bfr))
 	temp := make(map[string]interface{})
 	derr := dec.Decode(&temp)
-	log.Println(derr)
-	log.Println("Decoded temp ", temp)
+	// log.Println(derr)
+	// log.Println("Decoded temp ", temp)
 
-	return nil
+	return derr
 }
 
 func SaveMapStructure2(data interface{}, fname, keyname, valname string, formated ...bool) {
@@ -345,11 +346,13 @@ func GetIntKeys(data interface{}) VectorI {
 }
 
 func SaveStructure(data interface{}, fname string, formated ...bool) {
+
 	var doFormat bool = true
 	if len(formated) > 0 {
 		doFormat = formated[0]
 	}
 	output, err := json.Marshal(data)
+
 	if err != nil {
 		log.Println("Unable to Marshal it : Err ", err)
 		return
@@ -368,6 +371,11 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 		// return output
 	}
 
+}
+
+func ModInt(number, N int) int {
+	return int(math.Mod(float64(number), float64(N)))
+	// return number / N
 }
 
 func format(jbdata []byte) []byte {

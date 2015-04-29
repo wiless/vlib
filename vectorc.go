@@ -69,8 +69,11 @@ func (l *Location3D) SetLoc(loc2D complex128, height float64) {
 	*l = FromCmplx(loc2D)
 	l.SetHeight(height)
 }
+func (l *Location3D) SetXY(x, y float64) {
+	l.X, l.Y = x, y
+}
 
-func (l *Location3D) SetLocXYZ(x, y, z float64) {
+func (l *Location3D) SetXYZ(x, y, z float64) {
 	l.X, l.Y, l.Z = x, y, z
 }
 
