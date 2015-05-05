@@ -436,3 +436,12 @@ func Sorted(data VectorF) (values VectorF, indx VectorI) {
 	}
 	return VectorF(result), indx
 }
+
+func IterateF(input VectorF, myfunc func(float64) float64) VectorF {
+	result := NewVectorF(input.Size())
+	for indx, arg := range input {
+		result[indx] = myfunc(arg)
+	}
+	return result
+
+}
