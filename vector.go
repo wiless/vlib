@@ -447,6 +447,16 @@ func (v VectorF) At(indx VectorI) VectorF {
 	return result
 }
 
+func (v VectorI) Find(x int) int {
+	result := -1
+	for i, val := range v {
+		if x == val {
+			return i
+		}
+	}
+	return result
+}
+
 func (v VectorI) Get(indx int) int {
 	if indx < 0 || indx >= v.Size() {
 		log.Panicln("VectorF::Get() Index out of Bounds.. ")
