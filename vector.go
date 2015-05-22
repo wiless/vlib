@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"sort"
 	// "os"
 	"regexp"
 	"strconv"
@@ -402,11 +403,12 @@ func (v *VectorF) Swap(i, j int) {
 	(*v)[i], (*v)[j] = (*v)[j], (*v)[i]
 }
 
-func (v VectorF) Find(x float64) int {
-	result := -1
+func (v VectorF) Find(x float64) VectorI {
+	var result VectorI
+
 	for i, val := range v {
 		if x == val {
-			return i
+			result.AppendAtEnd(i)
 		}
 	}
 	return result
@@ -428,6 +430,28 @@ func (v VectorF) FindSorted(x float64) int {
 
 	}
 	return result
+}
+
+//Sorts the vector in Ascending order by default
+func (v VectorF) Sorted() (sorted VectorF) {
+	result := v.Clone()
+	sort.Float64s([]float64(result))
+
+	return result
+}
+
+//Sorts the vector in Ascending order by default
+func (v VectorF) Sorted2() (sorted VectorF, indx VectorI) {
+	result := v.Clone()
+	sort.Float64s([]float64(result))
+
+	// var tmp VectorI
+	for i := 0; i < result.Len(); {
+		tmp := v.Find(result[i])
+		indx.AppendAtEnd(tmp...)
+		i += tmp.Size()
+	}
+	return result, indx
 }
 
 func (v VectorF) Get(indx int) float64 {
@@ -464,7 +488,7 @@ func (v VectorI) Get(indx int) int {
 	return v[indx]
 }
 
-func (v VectorI) At(indx VectorI) VectorI {
+func (v VectorI) At(indx ...int) VectorI {
 
 	result := NewVectorI(v.Size())
 	for i := 0; i < v.Size(); i++ {
@@ -578,6 +602,44 @@ func Dot(input1 VectorF, input2 VectorF) float64 {
 	for _, val := range temp {
 		result += val
 	}
+	return result
+}
+
+func (v VectorI) Flip() VectorI {
+
+	// var result Vec
+	size := len(v)
+	result := NewVectorI(size)
+
+	// short loop method-1
+	for indx, val := range v {
+		result[size-indx-1] = val
+	}
+	// short loop method-2
+	// copy(result, input)
+
+	// for i, j := 0, size-1; i < j; i, j = i+1, j-1 {
+	// 	result[i], result[j] = result[j], result[i]
+	// }
+	return result
+}
+
+func (v VectorF) Flip() VectorF {
+
+	// var result Vec
+	size := len(v)
+	result := NewVectorF(size)
+
+	// short loop method-1
+	for indx, val := range v {
+		result[size-indx-1] = val
+	}
+	// short loop method-2
+	// copy(result, input)
+
+	// for i, j := 0, size-1; i < j; i, j = i+1, j-1 {
+	// 	result[i], result[j] = result[j], result[i]
+	// }
 	return result
 }
 
@@ -854,4 +916,25 @@ func (c *VectorI) Decode(databyte []byte) error {
 	// *c = ParseCVec(string(databyte))
 	return err
 
+}
+
+func (v VectorI) Sub(offset int) VectorI {
+	return v.Add(-offset)
+}
+
+func (v VectorI) Add(offset int) VectorI {
+	result := NewVectorI(len(v))
+	for k := range v {
+		result[k] = v[k] + offset
+	}
+	return result
+}
+
+/// SumDb sums the Db values in linear scale and returns back in DB
+func SumDb(dBVals ...float64) float64 {
+	result := 0.0
+	for _, val := range dBVals {
+		result += InvDb(val)
+	}
+	return Db(result)
 }

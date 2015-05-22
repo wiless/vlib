@@ -20,8 +20,34 @@ import (
 // type Complex complex128
 var Origin3D Location3D
 
+// x=r \, \sin\theta \, \cos\varphi
+// y=r \, \sin\theta \, \sin\varphi
+// z=r \, \cos\theta
+
 type Location3D struct {
 	X, Y, Z float64
+}
+
+func (l *Location3D) ToSpherical() (r, thetaH, thetaV float64) {
+
+	return 0, 0, 0
+}
+
+// FromSpherical converts the r,thetaH and thetaV (all in degree to Cartesian)
+func (l *Location3D) FromSpherical(r, thetaH, thetaV float64) {
+	thetaH = ToRadian(thetaH)
+	thetaV = ToRadian(thetaV)
+	l.X = r * math.Sin(thetaH) * math.Cos(thetaV)
+	l.Y = r * math.Sin(thetaH) * math.Sin(thetaV)
+	l.Z = r * math.Cos(thetaH)
+}
+
+func (l *Location3D) Float64() []float64 {
+	return []float64{l.X, l.Y, l.Z}
+}
+
+func (l *Location3D) Float32() []float32 {
+	return []float32{float32(l.X), float32(l.Y), float32(l.Z)}
 }
 
 func (l *Location3D) XY() complex128 {
