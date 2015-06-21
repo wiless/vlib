@@ -3,6 +3,7 @@ package vlib
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"strings"
 
 	ms "github.com/mitchellh/mapstructure"
 )
@@ -347,6 +349,43 @@ func GetIntKeys(data interface{}) VectorI {
 
 func SaveStructure(data interface{}, fname string, formated ...bool) {
 
+	if reflect.TypeOf(data).Kind() == reflect.Map {
+		keyname := "key"
+		elemName := "Value"
+
+		// For the KeyType
+
+		mtype := reflect.TypeOf(data)
+
+		keytype := mtype.Key()
+		valtype := mtype.Elem()
+		if keytype.Kind() == reflect.Ptr {
+			keytype = keytype.Elem()
+		}
+
+		if keytype.PkgPath() == "" {
+			// Its a standard type
+			keyname = "ID"
+		} else {
+			keyname = keytype.String()
+		}
+		// For the Value
+		if valtype.Kind() == reflect.Ptr {
+			valtype = valtype.Elem()
+		}
+		if valtype.PkgPath() == "" {
+			// Its a standard type
+			elemName = valtype.String()
+			elemName = "Value" //;  + strings.TrimLeft(elemName, "*")
+		} else {
+			elemName = valtype.String()
+			elemName = elemName[strings.LastIndex(elemName, ".")+1:]
+			elemName = strings.TrimLeft(elemName, "*")
+		}
+		SaveMapStructure2(data, fname, keyname, elemName, formated...)
+		return
+	}
+
 	var doFormat bool = true
 	if len(formated) > 0 {
 		doFormat = formated[0]
@@ -444,4 +483,44 @@ func IterateF(input VectorF, myfunc func(float64) float64) VectorF {
 	}
 	return result
 
+}
+
+// Internal utility to convert a struct into array of strings
+func Struct2Strings(a interface{}) ([]string, error) {
+	if reflect.TypeOf(a).Kind() != reflect.Struct {
+		return nil, errors.New("Input Data not of Type Struct")
+	}
+
+	mvalue := reflect.ValueOf(a)
+	mtype := reflect.TypeOf(a)
+	var result []string = make([]string, 0, mtype.NumField())
+	cnt := 0
+	for i := 0; i < mtype.NumField(); i++ {
+		// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+		if mvalue.Field(i).CanInterface() && mtype.Field(i).Type.Kind() != reflect.Slice {
+			result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+			cnt++
+		}
+	}
+	return result, nil
+}
+
+// Internal utility to convert a struct into array of strings
+func Struct2Header(a interface{}) ([]string, error) {
+	if reflect.TypeOf(a).Kind() != reflect.Struct {
+		return nil, errors.New("Input Data not of Type Struct")
+	}
+
+	mtype := reflect.TypeOf(a)
+	var result []string = make([]string, 0, mtype.NumField())
+	cnt := 0
+
+	for i := 0; i < mtype.NumField(); i++ {
+		if mtype.Field(i).PkgPath == "" && mtype.Field(i).Type.Kind() != reflect.Slice {
+			// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+			result = append(result, mtype.Field(i).Name)
+			cnt++
+		}
+	}
+	return result, nil
 }

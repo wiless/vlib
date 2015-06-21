@@ -103,6 +103,14 @@ func (l *Location3D) SetXYZ(x, y, z float64) {
 	l.X, l.Y, l.Z = x, y, z
 }
 
+func from2D(loc complex128, height float64) [3]float64 {
+	var result [3]float64
+	result[0] = real(loc)
+	result[1] = imag(loc)
+	result[2] = height
+	return result
+}
+
 func FromVectorC(loc2d VectorC, height float64) []Location3D {
 	result := make([]Location3D, loc2d.Size())
 

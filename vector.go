@@ -414,6 +414,16 @@ func (v VectorF) Find(x float64) VectorI {
 	return result
 }
 
+func (v VectorF) Contains(x float64) bool {
+
+	for _, val := range v {
+		if x == val {
+			return true
+		}
+	}
+	return false
+}
+
 // Assumes descending ordered vector
 func (v VectorF) FindSorted(x float64) int {
 	result := -1
@@ -479,6 +489,16 @@ func (v VectorI) Find(x int) int {
 		}
 	}
 	return result
+}
+
+func (v VectorI) Contains(x int) bool {
+
+	for _, val := range v {
+		if x == val {
+			return true
+		}
+	}
+	return false
 }
 
 func (v VectorI) Get(indx int) int {
