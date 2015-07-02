@@ -916,26 +916,48 @@ func (c *VectorI) MarshalJSON() ([]byte, error) {
 	// 	// return []byte(result), nil
 }
 
-// func (c *VectorI) UnmarshalJSON(databyte []byte) error {
-// 	// ParseCVec
-// 	var floatarray []float64
-// 	err := json.Unmarshal(databyte, floatarray)
-// 	fmt.Println("Unmarshal : VectorI", err, floatarray)
-
-// 	// *c = ParseCVec(string(databyte))
-// 	return err
-
-// }
-
-func (c *VectorI) Decode(databyte []byte) error {
+func (c *VectorI) UnmarshalJSON(databyte []byte) error {
 	// ParseCVec
 	var floatarray []float64
+
+	if string(databyte) == `""` {
+		*c = NewVectorI(0)
+
+		return nil
+	}
+	// fmt.Println("Vector I : ", string(databyte), string(databyte) == `""`)
 	err := json.Unmarshal(databyte, floatarray)
 	fmt.Println("Unmarshal : VectorI", err, floatarray)
 
 	// *c = ParseCVec(string(databyte))
 	return err
 
+}
+
+func (c *VectorI) Decode(databyte []byte) error {
+	// ParseCVec
+	var floatarray []float64
+
+	if string(databyte) == `""` {
+		// c.Resize(0)
+		*c = NewVectorI(0)
+		return nil
+	}
+
+	err := json.Unmarshal(databyte, floatarray)
+	fmt.Println("Decode : VectorI", err, floatarray)
+
+	// *c = ParseCVec(string(databyte))
+	return err
+
+}
+
+func (v VectorI) Scale(offset int) VectorI {
+	result := NewVectorI(len(v))
+	for k := range v {
+		result[k] = v[k] * offset
+	}
+	return result
 }
 
 func (v VectorI) Sub(offset int) VectorI {

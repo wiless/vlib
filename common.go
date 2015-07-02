@@ -2,6 +2,7 @@ package vlib
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -409,7 +410,7 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 		fmt.Fprintf(fd, "%s", output)
 		// return output
 	}
-
+	fmt.Println("SUCCESS ==============================", fname)
 }
 
 func ModInt(number, N int) int {
@@ -485,6 +486,37 @@ func IterateF(input VectorF, myfunc func(float64) float64) VectorF {
 
 }
 
+func IsTypeNumeric(t reflect.Type) bool {
+	if t.Kind() >= reflect.Bool && t.Kind() <= reflect.Complex128 {
+		return true
+	}
+	return false
+}
+
+// Internal utility to convert a struct into array of strings
+func StructNum2Strings(a interface{}) ([]string, error) {
+	if reflect.TypeOf(a).Kind() != reflect.Struct {
+		return nil, errors.New("Input Data not of Type Struct")
+	}
+
+	mvalue := reflect.ValueOf(a)
+	mtype := reflect.TypeOf(a)
+	var result []string = make([]string, 0, mtype.NumField())
+	cnt := 0
+	for i := 0; i < mtype.NumField(); i++ {
+		// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+		if mvalue.Field(i).CanInterface() && mtype.Field(i).Type.Kind() != reflect.Slice {
+
+			if IsTypeNumeric(mtype.Field(i).Type) {
+				result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+			}
+
+			cnt++
+		}
+	}
+	return result, nil
+}
+
 // Internal utility to convert a struct into array of strings
 func Struct2Strings(a interface{}) ([]string, error) {
 	if reflect.TypeOf(a).Kind() != reflect.Struct {
@@ -523,4 +555,60 @@ func Struct2Header(a interface{}) ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+func DumpMap2CSV(fname string, arg interface{}) {
+
+	if !(reflect.TypeOf(arg).Kind() == reflect.Map || reflect.TypeOf(arg).Kind() == reflect.Slice) {
+		log.Println("Unable to Dump: Not Map or Struct interface")
+		return
+	}
+
+	arrayData := reflect.ValueOf(arg)
+
+	w, fer := os.Create(fname)
+	if fer != nil {
+		log.Print("Error Creating CSV file ", fer)
+	}
+	cwr := csv.NewWriter(w)
+	// var record [4]string
+
+	cwr.Comma = '\t'
+
+	if reflect.TypeOf(arg).Kind() == reflect.Map {
+
+		mapkeys := arrayData.MapKeys()
+		once := true
+		for _, key := range mapkeys {
+			metric := arrayData.MapIndex(key).Interface()
+
+			if once {
+				headers, _ := Struct2Header(metric)
+				w.WriteString("% " + strings.Join(headers, "\t") + "\n")
+				once = false
+			}
+			data, _ := Struct2Strings(metric)
+			cwr.Write(data)
+		}
+	}
+
+	if reflect.TypeOf(arg).Kind() == reflect.Slice {
+		tp := reflect.TypeOf(arg).Elem()
+
+		var headers string
+		for i := 0; i < tp.NumField(); i++ {
+
+			headers = headers + "\t" + tp.FieldByIndex([]int{i}).Name
+		}
+		w.WriteString("% " + headers + "\n")
+
+		for i := 0; i < arrayData.Len(); i++ {
+
+			metric := arrayData.Index(i).Interface()
+			data, _ := StructNum2Strings(metric)
+			cwr.Write(data)
+		}
+	}
+	cwr.Flush()
+	w.Close()
 }

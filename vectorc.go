@@ -62,7 +62,7 @@ func (l *Location3D) SetHeight(height float64) {
 	l.Z = height
 }
 
-func (l *Location3D) Cmplx() complex128 {
+func (l Location3D) Cmplx() complex128 {
 	return complex(l.X, l.Y)
 }
 
