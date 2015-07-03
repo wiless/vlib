@@ -5,10 +5,18 @@ package vlib
 import (
 
 	// "os"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
 )
+
+func (v VectorB) Size() int {
+	return len(v)
+}
+func (v VectorB) Len() int {
+	return v.Size()
+}
 
 func (v *VectorB) Resize(size int) {
 	// Only append etc length
@@ -21,6 +29,22 @@ func (v *VectorB) Resize(size int) {
 
 	//copy(*v, Vector(make([]int, size)))
 
+}
+
+func (v VectorB) Get(indx int) uint8 {
+	if indx < 0 || indx >= v.Len() {
+		log.Panicln("VectorF::Get() Index out of Bounds.. ")
+	}
+	return v[indx]
+}
+func (v VectorB) At(indx VectorI) VectorB {
+
+	result := NewVectorB(v.Size())
+	for i := 0; i < v.Len(); i++ {
+
+		result[i] = v.Get(indx[i])
+	}
+	return result
 }
 
 // Does elementwise XOR addition between vectors
