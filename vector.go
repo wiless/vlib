@@ -9,7 +9,7 @@ import (
 	"math"
 	"sort"
 	// "os"
-	"regexp"
+
 	"strconv"
 	"strings"
 )
@@ -33,95 +33,11 @@ func ElemMult(in1, in2 Vector) Vector {
 	return result
 }
 
-func (v VectorB) Size() int {
-	return len(v)
-}
-
-func (v VectorB) ToString() string {
-	var result string
-	size := v.Size()
-	for i := 0; i < size; i++ {
-		result += fmt.Sprintf("%d", v[i])
-	}
-	return result
-}
-
-func (v VectorB) CountErrors(in1 VectorB) int {
-	size := len(v)
-	if size != len(in1) {
-		return size
-	}
-	return (ElemAddB(v, in1)).NNZ()
-
-}
-
-func (v VectorB) IsEqual(in1 VectorB) bool {
-	size := len(v)
-	if size != len(in1) {
-		return false
-	}
-	if (ElemAddB(v, in1)).NNZ() == 0 {
-		return true
-	} else {
-		return false
-	}
-
-}
-func (v VectorB) NNZ() int {
-	size := len(v)
-	var result int = 0
-
-	for i := 0; i < size; i++ {
-		if v[i] == 1 {
-			result++
-		}
-
-	}
-	return result
-}
-
-// Does elementwise XOR addition between vectors
-func ElemAddB(in1, in2 VectorB) VectorB {
-	size := len(in1)
-	result := NewVectorB(size)
-
-	for i := 0; i < size; i++ {
-		// bool(in1[i])
-		if in1[i] == 1 && in2[i] == 1 {
-			result[i] = 0
-		} else if in1[i] == 1 || in2[i] == 1 {
-			result[i] = 1
-		}
-
-	}
-
-	return result
-}
-
-// func Sum(VectorB) VectorB {
-
 func InvDbF(in1 VectorF) VectorF {
 
 	result := NewVectorF(len(in1))
 	for i, val := range in1 {
 		result[i] = InvDb(val)
-	}
-
-	return result
-}
-
-// Does elementwise Multiplication (AND operator) addition between vectors
-func ElemMultB(in1, in2 VectorB) VectorB {
-	size := len(in1)
-	result := NewVectorB(size)
-
-	for i := 0; i < size; i++ {
-		if in1[i] == 1 && in2[i] == 1 {
-			result[i] = 1
-		} else {
-			result[i] = 0
-		}
-
 	}
 
 	return result
@@ -174,10 +90,6 @@ func NewSegmentI(begin, size int) VectorI {
 		result[i] = begin + i
 	}
 	return result
-}
-
-func NewVectorB(size int) VectorB {
-	return VectorB(make([]uint8, size))
 }
 
 func (v Vector) Size() int {
@@ -257,15 +169,6 @@ func NewOnesF(size int) (v VectorF) {
 	return result
 }
 
-func NewOnesB(size int) (v VectorB) {
-	result := VectorB(make([]uint8, size))
-
-	for i := 0; i < size; i++ {
-		result[i] = 1
-	}
-	return result
-}
-
 func (v *Vector) Ones() {
 	for i := 0; i < len(*v); i++ {
 		(*v)[i] = 1
@@ -304,26 +207,6 @@ func (v Vector) Scaleloat64(factor float64) VectorF {
 		VectorF[indx] = float64(val) * factor
 	}
 	return VectorF
-}
-
-func ToVectorB(str string) VectorB {
-
-	str = strings.TrimSpace(str)
-	var exp string = "[.|;&,: ]+"
-	regx, _ := regexp.Compile(exp)
-	bitstrlist := regx.Split(str, -1)
-	result := NewVectorB(len(bitstrlist))
-
-	for cnt, bitstr := range bitstrlist {
-		// if bitstr != "" {
-		bit, _ := strconv.ParseUint(bitstr, 10, 1)
-		result[cnt] = uint8(bit)
-		// fmt.Printf("\n %d , %s , %d => %d", cnt, bitstr, bit, result[cnt])
-		// }
-
-	}
-
-	return result
 }
 
 func ToVectorF(str string) VectorF {
@@ -566,6 +449,11 @@ func (v VectorF) IsEq(vals VectorF) bool {
 
 	}
 	return true
+}
+
+func (v *VectorI) SetSubVec(pos int, vals VectorI) {
+	loc := *v
+	copy(loc[pos:], vals)
 }
 
 func (v *VectorF) SetSubVec(pos int, vals VectorF) {
