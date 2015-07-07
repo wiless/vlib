@@ -30,7 +30,44 @@ func (v *VectorB) Resize(size int) {
 	//copy(*v, Vector(make([]int, size)))
 
 }
+func (v VectorB) Clone() VectorB {
+	result := NewVectorB(v.Size())
+	copy(result, v)
+	return result
+}
 
+func (v VectorB) Scale2n(n uint) VectorB {
+	// Only append etc length
+	result := v.Clone()
+
+	for i := 0; i < len(v); i++ {
+		result[i] = result[i] << n
+	}
+	return result
+	//copy(*v, Vector(make([]int, size)))
+
+}
+
+func (v VectorB) ErrorCount(compare VectorB) int {
+	errors := 0
+	for i := range v {
+		if v[i] != compare[i] {
+			errors++
+		}
+	}
+	return errors
+}
+func (v VectorB) Scale(n int) VectorI {
+	// Only append etc length
+	result := NewVectorI(v.Size())
+
+	for i := 0; i < len(v); i++ {
+		result[i] = int(result[i]) * n
+	}
+	return result
+	//copy(*v, Vector(make([]int, size)))
+
+}
 func (v VectorB) Get(indx int) uint8 {
 	if indx < 0 || indx >= v.Len() {
 		log.Panicln("VectorF::Get() Index out of Bounds.. ")

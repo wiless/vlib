@@ -5,6 +5,16 @@ import (
 	"math/rand"
 )
 
+func RandBitsF(size int) VectorF {
+	var result = make([]float64, size)
+	for i := 0; i < size; i++ {
+		if rand.Float32() >= 0.5 {
+			result[i] = 1.0
+		}
+	}
+	return result
+}
+
 func Randsrc(size int, maxvalue int) VectorI {
 	var result = make([]int, size)
 	for i := 0; i < size; i++ {
@@ -17,7 +27,7 @@ func Randsrc(size int, maxvalue int) VectorI {
 func RandB(N int) VectorB {
 	result := NewVectorB(N)
 	for i := 0; i < N; i++ {
-		result[i] = uint8(rand.Intn(2))
+		result[i] = uint8(rand.Int63n(2))
 	}
 	return result
 }

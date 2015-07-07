@@ -578,13 +578,34 @@ func Sum(v VectorF) float64 {
 	return result
 
 }
-
+func (v VectorF) Min() float64 {
+	if len(v) < 1 {
+		log.Panicf("Min of Empty Vector ", v)
+	}
+	result := v[0]
+	for _, val := range v {
+		result = math.Min(result, val)
+	}
+	return result
+}
 func Min(v VectorF) float64 {
 	var result float64
+	// if len(v) == 2 {
+	// 	fmt.Println("Special case ", v)
+	// }
+
+	if v == nil {
+		log.Panicln("REALLY")
+	}
 	if v.Size() < 1 {
+		log.Panicf("Min of Empty Vector")
 		return math.NaN()
 	}
 	result = v[0]
+	if math.IsNaN(result) || math.IsInf(result, 0) {
+		log.Panicln("REALLY")
+	}
+
 	for _, val := range v {
 		result = math.Min(result, val)
 	}
