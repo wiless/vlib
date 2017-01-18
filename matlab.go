@@ -114,6 +114,8 @@ func (m *Matlab) Export(varname string, data interface{}) {
 		str = fmt.Sprintf("%s = %d;", varname, data)
 	case "vlib.VectorF":
 		str = fmt.Sprintf("%s = %v;", varname, data)
+	case "vlib.VectorI":
+		str = fmt.Sprintf("%s = %v;", varname, data)
 	case "[]string":
 		str = fmt.Sprintf("%s = %v;", varname, data)
 	default:

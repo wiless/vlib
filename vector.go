@@ -356,8 +356,8 @@ func (v VectorF) Get(indx int) float64 {
 
 func (v VectorF) At(indx VectorI) VectorF {
 
-	result := NewVectorF(v.Size())
-	for i := 0; i < v.Len(); i++ {
+	result := NewVectorF(len(indx))
+	for i := 0; i < result.Len(); i++ {
 
 		result[i] = v.Get(indx[i])
 	}
@@ -393,8 +393,8 @@ func (v VectorI) Get(indx int) int {
 
 func (v VectorI) At(indx ...int) VectorI {
 
-	result := NewVectorI(v.Size())
-	for i := 0; i < v.Size(); i++ {
+	result := NewVectorI(len(indx))
+	for i := 0; i < len(indx); i++ {
 
 		result[i] = v.Get(indx[i])
 	}
@@ -888,4 +888,59 @@ func SumDb(dBVals ...float64) float64 {
 		result += InvDb(val)
 	}
 	return Db(result)
+}
+
+func (v VectorF) ToCSV() []string {
+	str := fmt.Sprintf("%f", v)
+	str = strings.TrimPrefix(str, "[")
+	str = strings.TrimSuffix(str, "]")
+	result := strings.Split(str, " ")
+	return result
+}
+
+func (v VectorI) ToCSV() []string {
+	str := fmt.Sprintf("%d", v)
+	str = strings.TrimPrefix(str, "[")
+	str = strings.TrimSuffix(str, "]")
+	result := strings.Split(str, " ")
+	return result
+}
+
+func (v VectorF) ToCSVStr() string {
+	str := fmt.Sprintf("%f", v)
+	str = strings.TrimPrefix(str, "[")
+	str = strings.TrimSuffix(str, "]")
+	result := strings.Replace(str, " ", ",", -1)
+	return result
+}
+
+func (v VectorI) ToCSVStr() string {
+	str := fmt.Sprintf("%d", v)
+	str = strings.TrimPrefix(str, "[")
+	str = strings.TrimSuffix(str, "]")
+	result := strings.Replace(str, " ", ",", -1)
+	return result
+}
+
+type VSliceF struct {
+	sort.Float64Slice
+	idx []int
+}
+
+func (v VSliceF) SIndex() []int {
+
+	return v.idx
+}
+func (s *VSliceF) Swap(i, j int) {
+	s.Float64Slice.Swap(i, j)
+	s.idx[i], s.idx[j] = s.idx[j], s.idx[i]
+
+}
+
+func NewVSliceF(n ...float64) *VSliceF {
+	s := &VSliceF{Float64Slice: sort.Float64Slice(n), idx: make([]int, len(n))}
+	for i := range s.idx {
+		s.idx[i] = i
+	}
+	return s
 }
