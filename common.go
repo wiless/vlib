@@ -23,6 +23,7 @@ type VectorF []float64
 type VectorB []uint8
 type VectorI []int
 type VectorC []complex128
+type VectorBool []bool
 
 // type VectorIface interface {
 // }

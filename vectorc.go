@@ -24,100 +24,11 @@ var Origin3D Location3D
 // y=r \, \sin\theta \, \sin\varphi
 // z=r \, \cos\theta
 
-type Location3D struct {
-	X, Y, Z float64
-}
-
-func (l *Location3D) ToSpherical() (r, thetaH, thetaV float64) {
-
-	return 0, 0, 0
-}
-
-// FromSpherical converts the r,thetaH and thetaV (all in degree to Cartesian)
-func (l *Location3D) FromSpherical(r, thetaH, thetaV float64) {
-	thetaH = ToRadian(thetaH)
-	thetaV = ToRadian(thetaV)
-	l.X = r * math.Sin(thetaH) * math.Cos(thetaV)
-	l.Y = r * math.Sin(thetaH) * math.Sin(thetaV)
-	l.Z = r * math.Cos(thetaH)
-}
-
-func (l *Location3D) Float64() []float64 {
-	return []float64{l.X, l.Y, l.Z}
-}
-
-func (l *Location3D) Float32() []float32 {
-	return []float32{float32(l.X), float32(l.Y), float32(l.Z)}
-}
-
-func (l *Location3D) XY() complex128 {
-	return complex(l.X, l.Y)
-}
-
-func (l *Location3D) XZ() complex128 {
-	return complex(l.Z, l.X)
-}
-
-func (l *Location3D) SetHeight(height float64) {
-	l.Z = height
-}
-
-func (l Location3D) Cmplx() complex128 {
-	return complex(l.X, l.Y)
-}
-
-func (l Location3D) Scale3D(factor float64) Location3D {
-	l.X *= factor
-	l.Y *= factor
-	l.Z *= factor
-	return l
-}
-
-func (l Location3D) Scale(factor float64) Location3D {
-	l.X *= factor
-	l.Y *= factor
-	// l.Z = factor
-	return l
-}
-
-func (l Location3D) Shift3D(delta Location3D) Location3D {
-	l.X += delta.X
-	l.Y += delta.Y
-	l.Z += delta.Z
-	return l
-}
-
-func (l *Location3D) Shift2D(deltaxy complex128) {
-	l.Shift3D(FromCmplx(deltaxy))
-}
-
-func (l *Location3D) SetLoc(loc2D complex128, height float64) {
-	*l = FromCmplx(loc2D)
-	l.SetHeight(height)
-}
-func (l *Location3D) SetXY(x, y float64) {
-	l.X, l.Y = x, y
-}
-
-func (l *Location3D) SetXYZ(x, y, z float64) {
-	l.X, l.Y, l.Z = x, y, z
-}
-
 func from2D(loc complex128, height float64) [3]float64 {
 	var result [3]float64
 	result[0] = real(loc)
 	result[1] = imag(loc)
 	result[2] = height
-	return result
-}
-
-func FromVectorC(loc2d VectorC, height float64) []Location3D {
-	result := make([]Location3D, loc2d.Size())
-
-	for indx, val := range loc2d {
-		result[indx] = FromCmplx(val)
-		result[indx].SetHeight(height)
-	}
 	return result
 }
 
@@ -167,6 +78,13 @@ func (l *Location3D) Length() float64 {
 	sum := math.Pow(l.X, 2)
 	sum += math.Pow(l.Y, 2)
 	sum += math.Pow(l.Z, 2)
+	return math.Sqrt(sum)
+}
+
+func (l *Location3D) Distance2DFrom(src Location3D) float64 {
+
+	sum := math.Pow(l.X-src.X, 2)
+	sum += math.Pow(l.Y-src.Y, 2)
 	return math.Sqrt(sum)
 }
 

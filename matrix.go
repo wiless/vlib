@@ -3,7 +3,7 @@ package vlib
 import (
 	"fmt"
 	"log"
-
+	"math"
 	// "math"
 	// // "os"
 	// "strconv"
@@ -47,6 +47,31 @@ func ReShape(v VectorF, rows, cols int) MatrixF {
 		}
 	}
 	return m
+}
+
+func (m MatrixF) Len() int {
+	return m.NRows()
+}
+func (m MatrixF) XYZ(i int) (x, y, z float64) {
+
+	if i < m.NRows() && m.NCols() >= 3 {
+		tmp := m.GetRow(i)
+		return tmp[0], tmp[1], tmp[2]
+	}
+	// return math.MaxFloat64, math.MaxFloat64
+	return math.NaN(), math.NaN(), math.NaN()
+
+}
+
+func (m MatrixF) XY(i int) (x, y float64) {
+
+	if i < m.NRows() && m.NCols() >= 2 {
+		tmp := m.GetRow(i)
+		return tmp[0], tmp[1]
+	}
+	// return math.MaxFloat64, math.MaxFloat64
+	return math.NaN(), math.NaN()
+
 }
 
 func (m MatrixF) Elems() VectorF {
@@ -445,7 +470,7 @@ func (m *MatrixF) AppendRow(v VectorF) {
 	*m = append(*m, v)
 }
 
-func (m *MatrixF) AppendColumn(colvec VectorF) {
+func (m *MatrixF) AppendColumn(colvec VectorF) *MatrixF {
 	targetRows := colvec.Size()
 	rows, cols := m.Size()
 
@@ -468,7 +493,7 @@ func (m *MatrixF) AppendColumn(colvec VectorF) {
 		(*m)[minRows+i][cols] = colvec[minRows+i]
 		// fmt.Printf("\n Adding %vth Row Col valu %v ", minRows+i, colvec[minRows+i])
 	}
-
+	return m
 	/// if targetRows>rows , add  additional rows zeros(targetRows-rows,cols)
 
 }

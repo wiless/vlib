@@ -132,6 +132,21 @@ func (v *VectorF) Resize(size int) {
 	if extra > 0 {
 		tailvec := NewVectorF(extra)
 		*v = append(*v, tailvec...)
+	} else {
+		// for i := 0; i < extra; i++ {
+
+		*v = (*v)[0:size]
+		// for i := size; i < -error; i++ {
+		// 	(*v)[i] = nil
+		// }
+		// result := NewVectorI(v.Size())
+		// copy(result, v)
+		// copy(result[pos:], result[pos+1:])
+		//
+		// return result[:v.Size()-1]
+
+		// }
+
 	}
 
 	//copy(*v, Vector(make([]int, size)))
@@ -144,6 +159,9 @@ func (v *VectorI) Resize(size int) {
 	if extra > 0 {
 		tailvec := NewVectorI(extra)
 		*v = append(*v, tailvec...)
+	} else {
+
+		*v = (*v)[0:size]
 	}
 
 	//copy(*v, Vector(make([]int, size)))
@@ -352,6 +370,16 @@ func (v VectorF) Get(indx int) float64 {
 		log.Panicln("VectorF::Get() Index out of Bounds.. ")
 	}
 	return v[indx]
+}
+
+//Value supports Valuer interface for the gonum/Plot tools
+func (v VectorF) Value(i int) float64 {
+	if i < len(v) {
+		return v[i]
+	} else {
+		return math.NaN()
+	}
+
 }
 
 func (v VectorF) At(indx VectorI) VectorF {

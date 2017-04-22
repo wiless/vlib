@@ -15,6 +15,15 @@ func RandBitsF(size int) VectorF {
 	return result
 }
 
+func RandI(size int, maxvalue int) []int {
+	var result = make([]int, size)
+	for i := 0; i < size; i++ {
+		result[i] = rand.Intn(maxvalue)
+
+	}
+	return result
+}
+
 func Randsrc(size int, maxvalue int) VectorI {
 	var result = make([]int, size)
 	for i := 0; i < size; i++ {
