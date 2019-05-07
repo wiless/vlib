@@ -113,8 +113,8 @@ func RandUC(variance float64) complex128 {
 	return result
 }
 
-// Generates Uniformly  distributed complex number
-// Both real and imaginary part are uniformly distributed
+// Generates Uniformly distributed Float Vector of size size
+// Values between 0 to 1 uses rand.Float64()
 func RandUFVec(size int) VectorF {
 
 	result := NewVectorF(size)

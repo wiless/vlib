@@ -294,6 +294,13 @@ func (v *VectorC) PlusEqual(input VectorC) {
 	}
 
 }
+func (v VectorC) Abs() VectorF {
+	result := NewVectorF(v.Size())
+	for indx, val := range v {
+		result[indx] = cmplx.Abs(val)
+	}
+	return result
+}
 
 func (v VectorC) Real() VectorF {
 	result := NewVectorF(v.Size())

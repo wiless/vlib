@@ -59,16 +59,19 @@ func Radian(degree float64) float64 {
 	return degree * math.Pi / 180.0
 }
 
-func FromXYVecF(fx, fy VectorF) PointA {
-	if len(fx) != len(fy) {
-		return nil
-	}
-	p := make(PointA, len(fx))
-	for indx, _ := range fx {
-		p[indx].X = fx[indx]
-		p[indx].Y = fy[indx]
-	}
-	return p
+// Vector2D is a  XYer interface based on two VectorF
+type Vector2D struct {
+	X, Y VectorF
+}
+
+// XY returns X and Y value of the sample i
+func (v *Vector2D) XY(i int) (X, Y float64) {
+	return v.X[i], v.Y[i]
+}
+
+// Len returns the length of the XY
+func (v *Vector2D) Len() int {
+	return v.X.Len()
 }
 
 func FromVecCabs(f VectorC) PointA {
@@ -411,7 +414,8 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 		fmt.Fprintf(fd, "%s", output)
 		// return output
 	}
-	fmt.Println("SUCCESS ==============================", fname)
+
+	// fmt.Println("SUCCESS ==============================", fname)
 }
 
 func ModInt(number, N int) int {
@@ -612,4 +616,14 @@ func DumpMap2CSV(fname string, arg interface{}) {
 	}
 	cwr.Flush()
 	w.Close()
+}
+
+func Log(vec VectorF) (result VectorF) {
+	result.Resize(vec.Len())
+	for i, val := range vec {
+		if val != 0 {
+			result[i] = math.Log(val)
+		}
+	}
+	return result
 }
