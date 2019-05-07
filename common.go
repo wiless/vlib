@@ -65,12 +65,12 @@ type Vector2D struct {
 }
 
 // XY returns X and Y value of the sample i
-func (v *Vector2D) XY(i int) (X, Y float64) {
+func (v Vector2D) XY(i int) (X, Y float64) {
 	return v.X[i], v.Y[i]
 }
 
 // Len returns the length of the XY
-func (v *Vector2D) Len() int {
+func (v Vector2D) Len() int {
 	return v.X.Len()
 }
 
