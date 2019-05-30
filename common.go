@@ -153,7 +153,7 @@ func Contains(array interface{}, elem interface{}) (found bool, index int) {
 			return false, -1
 
 		} else {
-			log.Panicln("Contains : MismatchType :  %v in %v ", elem, array)
+			log.Panicf("Contains : MismatchType :  %v in %v ", elem, array)
 		}
 	}
 
