@@ -149,6 +149,12 @@ func (v *VectorF) Resize(size int) {
 	//copy(*v, Vector(make([]int, size)))
 }
 
+func (v VectorI) AtVec(i, j int) float64 {
+	_ = j
+	value := float64(v[i])
+	return value
+}
+
 func (v *VectorI) Resize(size int) {
 	// Only append etc length
 	length := len(*v)
