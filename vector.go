@@ -78,11 +78,8 @@ func NewVectorI(size int) VectorI {
 	return VectorI(make([]int, size))
 }
 
-// NewSegmentI generates a sequences of index values, for each segment of size "size"
-// Assume of a segment of length 5, then each segment s_i will be
-// 	s_0 = {0, 1 , 2,3,4}
-// 	s_1 = {5,...9}
-// 	s_2 = {10,..14}
+// NewSegmentI generates a sequence of int values starting from BEGIN of
+//  length SIZE, e.g NewSegmentI(5,3) = [5,6,7]
 func NewSegmentI(begin, size int) VectorI {
 	var result VectorI
 	result = make([]int, size)
@@ -150,6 +147,12 @@ func (v *VectorF) Resize(size int) {
 	}
 
 	//copy(*v, Vector(make([]int, size)))
+}
+
+func (v VectorI) AtVec(i, j int) float64 {
+	_ = j
+	value := float64(v[i])
+	return value
 }
 
 func (v *VectorI) Resize(size int) {
@@ -304,6 +307,27 @@ func (v *VectorF) Swap(i, j int) {
 	(*v)[i], (*v)[j] = (*v)[j], (*v)[i]
 }
 
+func (v VectorF) FindGreater(x float64) VectorI {
+	var result VectorI
+
+	for i, val := range v {
+		if x > val {
+			result.AppendAtEnd(i)
+		}
+	}
+	return result
+}
+func (v VectorF) FindLess(x float64) VectorI {
+	var result VectorI
+
+	for i, val := range v {
+		if val < x {
+			result.AppendAtEnd(i)
+		}
+	}
+	return result
+}
+
 func (v VectorF) Find(x float64) VectorI {
 	var result VectorI
 
@@ -353,11 +377,15 @@ func (v VectorF) Sorted() (sorted VectorF) {
 
 //Sorts the vector in Ascending order by default
 func (v VectorF) Sorted2() (sorted VectorF, indx VectorI) {
+
 	result := v.Clone()
 	sort.Float64s([]float64(result))
 
 	// var tmp VectorI
 	for i := 0; i < result.Len(); {
+		if math.IsNaN(result[i]) {
+			log.Panicln("Sorted2 ", result)
+		}
 		tmp := v.Find(result[i])
 		indx.AppendAtEnd(tmp...)
 		i += tmp.Size()

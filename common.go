@@ -59,16 +59,19 @@ func Radian(degree float64) float64 {
 	return degree * math.Pi / 180.0
 }
 
-func FromXYVecF(fx, fy VectorF) PointA {
-	if len(fx) != len(fy) {
-		return nil
-	}
-	p := make(PointA, len(fx))
-	for indx, _ := range fx {
-		p[indx].X = fx[indx]
-		p[indx].Y = fy[indx]
-	}
-	return p
+// Vector2D is a  XYer interface based on two VectorF
+type Vector2D struct {
+	X, Y VectorF
+}
+
+// XY returns X and Y value of the sample i
+func (v Vector2D) XY(i int) (X, Y float64) {
+	return v.X[i], v.Y[i]
+}
+
+// Len returns the length of the XY
+func (v Vector2D) Len() int {
+	return v.X.Len()
 }
 
 func FromVecCabs(f VectorC) PointA {
@@ -150,7 +153,7 @@ func Contains(array interface{}, elem interface{}) (found bool, index int) {
 			return false, -1
 
 		} else {
-			log.Panicln("Contains : MismatchType :  %v in %v ", elem, array)
+			log.Panicf("Contains : MismatchType :  %v in %v ", elem, array)
 		}
 	}
 
@@ -411,7 +414,8 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 		fmt.Fprintf(fd, "%s", output)
 		// return output
 	}
-	fmt.Println("SUCCESS ==============================", fname)
+
+	// fmt.Println("SUCCESS ==============================", fname)
 }
 
 func ModInt(number, N int) int {
@@ -494,6 +498,13 @@ func IsTypeNumeric(t reflect.Type) bool {
 	return false
 }
 
+func IsTypeString(t reflect.Type) bool {
+	if t.Kind() == reflect.String {
+		return true
+	}
+	return false
+}
+
 // Internal utility to convert a struct into array of strings
 func StructNum2Strings(a interface{}) ([]string, error) {
 	if reflect.TypeOf(a).Kind() != reflect.Struct {
@@ -511,6 +522,9 @@ func StructNum2Strings(a interface{}) ([]string, error) {
 			if IsTypeNumeric(mtype.Field(i).Type) {
 				result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
 			}
+			// } else if IsTypeString(mtype.Field(i).Type) {
+			// 	result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+			// }
 
 			cnt++
 		}
@@ -601,7 +615,7 @@ func DumpMap2CSV(fname string, arg interface{}) {
 
 			headers = headers + "\t" + tp.FieldByIndex([]int{i}).Name
 		}
-		w.WriteString("% " + headers + "\n")
+		w.WriteString("%" + headers + "\n")
 
 		for i := 0; i < arrayData.Len(); i++ {
 
@@ -612,4 +626,72 @@ func DumpMap2CSV(fname string, arg interface{}) {
 	}
 	cwr.Flush()
 	w.Close()
+}
+
+// DumpMap2CSV2 dumps all the fields including numbers and strings to CSV
+func DumpMap2CSV2(fname string, arg interface{}) {
+
+	if !(reflect.TypeOf(arg).Kind() == reflect.Map || reflect.TypeOf(arg).Kind() == reflect.Slice) {
+		log.Println("Unable to Dump: Not Map or Struct interface")
+		return
+	}
+
+	arrayData := reflect.ValueOf(arg)
+
+	w, fer := os.Create(fname)
+	if fer != nil {
+		log.Print("Error Creating CSV file ", fer)
+	}
+	cwr := csv.NewWriter(w)
+	// var record [4]string
+
+	cwr.Comma = '\t'
+
+	if reflect.TypeOf(arg).Kind() == reflect.Map {
+
+		mapkeys := arrayData.MapKeys()
+		once := true
+		for _, key := range mapkeys {
+			metric := arrayData.MapIndex(key).Interface()
+
+			if once {
+				headers, _ := Struct2Header(metric)
+				w.WriteString("% " + strings.Join(headers, "\t") + "\n")
+				once = false
+			}
+			data, _ := Struct2Strings(metric)
+			cwr.Write(data)
+		}
+	}
+
+	if reflect.TypeOf(arg).Kind() == reflect.Slice {
+		tp := reflect.TypeOf(arg).Elem()
+
+		var headers string
+		for i := 0; i < tp.NumField(); i++ {
+
+			headers = headers + "\t" + tp.FieldByIndex([]int{i}).Name
+		}
+		w.WriteString("%" + headers + "\n")
+
+		for i := 0; i < arrayData.Len(); i++ {
+
+			metric := arrayData.Index(i).Interface()
+			data, _ := Struct2Strings(metric)
+			fmt.Println(data, metric)
+			cwr.Write(data)
+		}
+	}
+	cwr.Flush()
+	w.Close()
+}
+
+func Log(vec VectorF) (result VectorF) {
+	result.Resize(vec.Len())
+	for i, val := range vec {
+		if val != 0 {
+			result[i] = math.Log(val)
+		}
+	}
+	return result
 }
