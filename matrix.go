@@ -609,6 +609,35 @@ func ToMatrixC2(re, im MatrixF) MatrixC {
 	return result
 }
 
+func (m MatrixC) MatString() string {
+
+	str := fmt.Sprintf("[ ")
+	for r := 0; r < len(m); r++ {
+		for c := 0; c < len(m[r]); c++ {
+			str += fmt.Sprintf("%v ", m[r][c])
+
+		}
+		if r < len(m)-1 {
+			str += "; "
+		}
+
+	}
+	str += " ];"
+	return str
+}
+
+// Data returns the data in the matrix .. row and then column wise
+func (m MatrixC) Data() []complex128 {
+	result := NewVectorC(m.NCols() * m.NRows())
+	cnt := 0
+	for r := 0; r < len(m); r++ {
+		for c := 0; c < len(m[r]); c++ {
+			result[cnt] = m[r][c]
+			cnt++
+		}
+	}
+	return result
+}
 func (m MatrixC) NRows() (rows int) {
 
 	if len(m) == 0 {

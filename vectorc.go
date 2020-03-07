@@ -242,12 +242,18 @@ func (v *VectorC) Resize(size int) {
 
 }
 
+func (v VectorC) MatString() string {
+	return v.String() + "';"
+}
+
 func (v VectorC) String() string {
 	var result string
 	size := v.Size()
+	result = "["
 	for i := 0; i < size; i++ {
 		result += fmt.Sprintf("%f ", v[i])
 	}
+	result += "]"
 	return result
 }
 
