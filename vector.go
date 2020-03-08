@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"sort"
+
 	// "os"
 
 	"strconv"
@@ -76,6 +77,18 @@ func NewVectorF(size int) VectorF {
 
 func NewVectorI(size int) VectorI {
 	return VectorI(make([]int, size))
+}
+
+// NewSegmentI generates a sequence of int values starting from BEGIN of
+//  length SIZE, e.g NewSegmentF(0,0.5,4) = [0,0.5,1,1.5]
+func NewSegmentF(begin, step float64, size int) VectorF {
+	var result VectorF
+	result = make([]float64, size)
+
+	for i := 0; i < size; i++ {
+		result[i] = step * float64(i)
+	}
+	return result
 }
 
 // NewSegmentI generates a sequence of int values starting from BEGIN of

@@ -453,6 +453,22 @@ func WrapAngle(degree0to360 float64) (degreePlusMinus180 float64) {
 	return degreePlusMinus180
 
 }
+func Sinc(x float64) float64 {
+	if x == 0 {
+		return 1
+	} else {
+		return math.Sin(x) / x
+	}
+
+}
+
+func SincF(x VectorF) VectorF {
+	r := NewVectorF(x.Len())
+	for i, v := range x {
+		r[i] = Sinc(v)
+	}
+	return r
+}
 
 func ToDegree(radian float64) float64 {
 	return radian * 180.0 / math.Pi
