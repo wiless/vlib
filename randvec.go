@@ -1,6 +1,7 @@
 package vlib
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -193,9 +194,9 @@ func RandUMatrix(rows, cols int) MatrixF {
 
 func RandNMatrix(rows, cols int, variance float64) MatrixF {
 	result := NewMatrixF(rows, cols)
-	for i := 0; i < rows; i++ {
+	for i := 0; i < cols; i++ {
 		input := RandNFVec(rows, variance)
-
+		fmt.Println(input, result)
 		result.SetCol(i, input)
 	}
 

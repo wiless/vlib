@@ -249,9 +249,15 @@ func (v VectorC) MatString() string {
 func (v VectorC) String() string {
 	var result string
 	size := v.Size()
+	sizeL := size - 1
 	result = "["
 	for i := 0; i < size; i++ {
-		result += fmt.Sprintf("%f,", v[i])
+		if i != sizeL {
+			result += fmt.Sprintf("%f,", v[i])
+		} else {
+			result += fmt.Sprintf("%f", v[i])
+		}
+
 	}
 	result += "]"
 	return result
