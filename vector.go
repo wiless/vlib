@@ -991,6 +991,27 @@ func (v VectorI) ToCSVStr() string {
 	return result
 }
 
+func (v VectorF) MatString() string {
+	return v.String() + "';"
+}
+
+func (v VectorF) String() string {
+	var result string
+	size := v.Size()
+	result = "["
+	sizelim := size - 1
+	for i := 0; i < size; i++ {
+
+		if i != sizelim {
+			result += fmt.Sprintf("%f,", v[i])
+		} else {
+			result += fmt.Sprintf("%f", v[i])
+		}
+	}
+	result += "]"
+	return result
+}
+
 type VSliceF struct {
 	sort.Float64Slice
 	idx []int

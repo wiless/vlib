@@ -251,7 +251,7 @@ func (v VectorC) String() string {
 	size := v.Size()
 	result = "["
 	for i := 0; i < size; i++ {
-		result += fmt.Sprintf("%f ", v[i])
+		result += fmt.Sprintf("%f,", v[i])
 	}
 	result += "]"
 	return result
