@@ -195,6 +195,7 @@ func RandNMatrix(rows, cols int, variance float64) MatrixF {
 	result := NewMatrixF(rows, cols)
 	for i := 0; i < cols; i++ {
 		input := RandNFVec(rows, variance)
+
 		result.SetCol(i, input)
 	}
 

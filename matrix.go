@@ -698,3 +698,61 @@ func (m MatrixF) Minus(val MatrixF) MatrixF {
 	}
 	return result
 }
+
+//  matrix multiplication
+func Mul(A MatrixF, B MatrixF) MatrixF {
+	var i, j, k int
+	var total float64
+	var C MatrixF
+	rows1, cols1 := A.Size()
+	rows2, cols2 := B.Size()
+	if cols1 == rows2 {
+		C = NewMatrixF(rows1, cols2)
+
+		cols1 = cols1 + 0
+
+		total = 0.0
+		for i = 0; i < rows1; i++ {
+			for j = 0; j < cols2; j++ {
+				for k = 0; k < rows2; k++ {
+					total = total + A[i][k]*B[k][j]
+				}
+				C[i][j] = total
+				total = 0.0
+			}
+		}
+		return C
+	} else {
+		fmt.Println("Check Matrix Dimensions")
+		return C
+	}
+}
+
+//Complex matrix multiplication
+func MulC(A MatrixC, B MatrixC) MatrixC {
+	var i, j, k int
+	var total complex128
+	var C MatrixC
+	rows1, cols1 := A.Size()
+	rows2, cols2 := B.Size()
+	if cols1 == rows2 {
+		C = NewMatrixC(rows1, cols2)
+
+		cols1 = cols1 + 0
+
+		total = complex(0.0, 0.0)
+		for i = 0; i < rows1; i++ {
+			for j = 0; j < cols2; j++ {
+				for k = 0; k < rows2; k++ {
+					total = total + A[i][k]*B[k][j]
+				}
+				C[i][j] = total
+				total = 0.0
+			}
+		}
+		return C
+	} else {
+		fmt.Println("Check Matrix Dimensions")
+		return C
+	}
+}
