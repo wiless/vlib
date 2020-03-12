@@ -316,6 +316,14 @@ func (m *MatrixF) SetSubMatF(srow, scol int, input MatrixF) {
 
 }
 
+func (m MatrixC) GetCol(c int) VectorC {
+	result := NewVectorC(m.NRows())
+	for r := 0; r < m.NRows(); r++ {
+		result[r] = m[r][c]
+	}
+	return result
+}
+
 func (m *MatrixC) T() MatrixC {
 	rows, cols := m.Size()
 	result := NewMatrixC(cols, rows)
