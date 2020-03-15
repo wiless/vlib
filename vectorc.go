@@ -105,6 +105,9 @@ func RelativeGeo(src, dest Location3D) (distance3d, thetaH, thetaV float64) {
 	thetaV = cmplx.Phase(complex(r, z))
 	// thetaV = math.Acos(z / r)
 	distance3d = dest.DistanceFrom(src)
+	if thetaH < 0 {
+		thetaH = 2*math.Pi + thetaH
+	}
 	return distance3d, ToDegree(thetaH), ToDegree(thetaV)
 }
 
