@@ -182,7 +182,7 @@ func RandNFVec(samples int, variance float64) VectorF {
 
 func RandUMatrix(rows, cols int) MatrixF {
 	result := NewMatrixF(rows, cols)
-	for i := 0; i < rows; i++ {
+	for i := 0; i < cols; i++ {
 		input := RandUFVec(rows)
 
 		result.SetCol(i, input)
