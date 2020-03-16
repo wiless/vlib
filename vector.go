@@ -86,7 +86,7 @@ func NewSegmentF(begin, step float64, size int) VectorF {
 	result = make([]float64, size)
 
 	for i := 0; i < size; i++ {
-		result[i] = step * float64(i)
+		result[i] = begin + step*float64(i)
 	}
 	return result
 }
@@ -1033,4 +1033,25 @@ func NewVSliceF(n ...float64) *VSliceF {
 		s.idx[i] = i
 	}
 	return s
+}
+
+type fnF func(float64) float64
+type fnC func(complex128) complex128
+
+// ExecF calls the Function fn iteratively over all elements of a vector v
+func ExecF(v VectorF, fn fnF) VectorF {
+	r := NewVectorF(v.Len())
+	for i, val := range v {
+		r[i] = fn(val)
+	}
+	return r
+}
+
+// ExecC calls the Function fn iteratively over all elements of a vector v
+func ExecC(v VectorC, fn fnC) VectorC {
+	r := NewVectorC(v.Len())
+	for i, val := range v {
+		r[i] = fn(val)
+	}
+	return r
 }

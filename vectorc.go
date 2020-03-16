@@ -713,3 +713,8 @@ func ParseCVec(str string) VectorC {
 	// fmt.Printf("Parsed vector %v", result)
 	return result
 }
+
+// Len returns length of the vector
+func (v VectorC) Len() int {
+	return v.Size()
+}
