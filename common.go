@@ -398,12 +398,12 @@ func SaveStructure(data interface{}, fname string, formated ...bool) {
 	output, err := json.Marshal(data)
 
 	if err != nil {
-		log.Println("Unable to Marshal it : Err ", err)
+		log.Println("vlib:SaveStructure():Unable to Marshal it : Err ", err)
 		return
 	}
 	fd, ferr := os.Create(fname)
 	if ferr != nil {
-		log.Println("Unable to Create File  ", fname)
+		log.Println("vlib:SaveStructure():Unable to Create File  ", fname)
 		return
 	}
 
@@ -604,7 +604,7 @@ func DumpMap2CSV(fname string, arg interface{}) {
 	cwr := csv.NewWriter(w)
 	// var record [4]string
 
-	cwr.Comma = '\t'
+	cwr.Comma = ','
 
 	if reflect.TypeOf(arg).Kind() == reflect.Map {
 
@@ -615,7 +615,7 @@ func DumpMap2CSV(fname string, arg interface{}) {
 
 			if once {
 				headers, _ := Struct2Header(metric)
-				w.WriteString("% " + strings.Join(headers, "\t") + "\n")
+				w.WriteString(strings.Join(headers, ",") + "\n")
 				once = false
 			}
 			data, _ := Struct2Strings(metric)
@@ -628,10 +628,9 @@ func DumpMap2CSV(fname string, arg interface{}) {
 
 		var headers string
 		for i := 0; i < tp.NumField(); i++ {
-
-			headers = headers + "\t" + tp.FieldByIndex([]int{i}).Name
+			headers += tp.FieldByIndex([]int{i}).Name + ","
 		}
-		w.WriteString("%" + headers + "\n")
+		w.WriteString(headers + "\n")
 
 		for i := 0; i < arrayData.Len(); i++ {
 

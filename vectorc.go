@@ -2,6 +2,7 @@ package vlib
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"go/scanner"
 	"go/token"
@@ -140,19 +141,42 @@ func (c VectorC) MarshalJSON() ([]byte, error) {
 	// ParseCVec
 	var str []string
 	for _, val := range c {
-		str = append(str, fmt.Sprintf("%f%+fi", real(val), imag(val)))
+		str = append(str, fmt.Sprintf("\"%f%+fi\"", real(val), imag(val)))
 	}
-	result := "\"[" + strings.Join(str, ",") + "]\""
+	result := "[" + strings.Join(str, ",") + "]"
 	// log.Print(" \n JSONING vector ", result)
 	// str := fmt.Sprintf("\"%+g%+gi\"", real(c), imag(c))
 	return []byte(result), nil
 }
+
 func (c *VectorC) UnmarshalJSON(databyte []byte) error {
 	// ParseCVec
-	*c = ParseCVec(string(databyte))
+	str := string(databyte)
+	str = strings.TrimPrefix(str, "[")
+	str = strings.TrimSuffix(str, "[")
+	vals := strings.Split(str, ",")
+	c.Resize(len(vals))
+	for indx, v := range vals {
+		var cmpl Complex
+
+		if e := cmpl.UnmarshalJSON([]byte(v)); e == nil {
+			(*c)[indx] = complex128(cmpl)
+		} else {
+			return errors.New("Error Parsing UnmarshalJSON  " + v + e.Error())
+
+		}
+
+	}
 	return nil
 
 }
+
+// func (c *VectorC) UnmarshalJSON(databyte []byte) error {
+// 	// ParseCVec
+// 	*c = ParseCVec(string(databyte))
+// 	return nil
+
+// }
 
 func Conj(in1 VectorC) VectorC {
 	result := NewVectorC(in1.Size())
@@ -258,7 +282,7 @@ func (v VectorC) String() string {
 		if i != sizeL {
 			result += fmt.Sprintf("%f,", v[i])
 		} else {
-			result += fmt.Sprintf("%f", v[i])
+			result += fmt.Sprintf("%v", v[i])
 		}
 
 	}
@@ -309,6 +333,17 @@ func (v *VectorC) PlusEqual(input VectorC) {
 	}
 
 }
+
+func (v VectorC) At(indx VectorI) VectorC {
+
+	result := NewVectorC(len(indx))
+	for i := 0; i < result.Len(); i++ {
+
+		result[i] = v[indx[i]]
+	}
+	return result
+}
+
 func (v VectorC) Abs() VectorF {
 	result := NewVectorF(v.Size())
 	for indx, val := range v {
