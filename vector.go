@@ -135,6 +135,11 @@ func (v VectorF) Clone() VectorF {
 	return result
 }
 
+func (v VectorI) Clone() VectorI {
+	result := NewVectorI(v.Size())
+	copy(result, v)
+	return result
+}
 func (v *VectorF) Resize(size int) {
 	// Only append etc length
 	length := len(*v)
@@ -423,6 +428,9 @@ func (v VectorF) Value(i int) float64 {
 
 }
 
+func (v VectorI) Len() int {
+	return v.Size()
+}
 func (v VectorF) At(indx VectorI) VectorF {
 
 	result := NewVectorF(len(indx))
@@ -930,6 +938,11 @@ func (c *VectorI) Decode(databyte []byte) error {
 
 }
 
+func (v *VectorI) Fill(val int) {
+	for i := 0; i < v.Size(); i++ {
+		(*v)[i] = val
+	}
+}
 func (v VectorI) Scale(offset int) VectorI {
 	result := NewVectorI(len(v))
 	for k := range v {

@@ -476,25 +476,93 @@ func ToDegree(radian float64) float64 {
 func ToRadian(degree float64) float64 {
 	return degree * math.Pi / 180.0
 }
+func Shuffle(N int) (indx VectorI) {
+	tmp := RandUFVec(N)
+	_, indx = Sorted(tmp)
+	return indx
+}
+
+// func SortedI(data VectorI) (values VectorI, indx VectorI) {
+
+// 	result := sort.IntSlice(data.Clone())
+// 	sort.Sort(result)
+// 	// fmt.Printf("\n 2. Result is = %#v", result)
+
+// 	// sort.Sort(x)
+
+// 	indx = NewVectorI(data.Len())
+// 	indx.Fill(-1)
+// 	for j, v := range data {
+// 		res := result.Search(v)
+// 		// fmt.Printf("\n%d Searching %v .. Found at %d", j, v, res)
+// 		// indx[j] = res
+// 		if indx[res] != -1 {
+// 			indx[res+1] = j
+// 		} else {
+// 			indx[res] = j
+// 		}
+
+// 		// i := sort.Search(N, func(i int) bool { return result[i] <= v })
+// 		// if i < N && result[i] == v {
+// 		// 	indx[i] = j
+
+// 		// 	fmt.Printf("\nItem %d found %v at index %d in\n", j, v, i)
+// 		// } else {
+// 		// 	fmt.Printf("\n %v not found \n", v)
+// 		// }
+
+// 		// fmt.Printf("\n %v Found %f @ %d ", result, v, indx[i])
+// 		// 		if indx[i] < len(data) && data[i] == x {
+// 		// 	// x is present at data[i]
+// 		// } else {
+// 		// 	// x is not present in data,
+// 		// 	// but i is the index where it would be inserted.
+// 		// }
+
+// 	}
+
+// 	return VectorF(result), indx
+// }
+
+func SortedI(data VectorI) (values VectorI, indx VectorI) {
+
+	result := sort.IntSlice(data.Clone())
+	sort.Sort(result)
+
+	indx = NewVectorI(data.Len())
+	indx.Fill(-1)
+	for j, v := range data {
+		res := result.Search(v)
+
+		if indx[res] != -1 {
+			indx[res+1] = j
+		} else {
+			indx[res] = j
+		}
+
+	}
+
+	return VectorI(result), indx
+}
 
 func Sorted(data VectorF) (values VectorF, indx VectorI) {
 
-	result := data.Clone()
+	result := sort.Float64Slice(data.Clone())
+	sort.Sort(result)
 
-	sort.Sort(sort.Reverse(sort.Float64Slice(result)))
 	indx = NewVectorI(data.Len())
-	for i, v := range data {
-		indx[i] = result.FindSorted(v)
+	indx.Fill(-1)
+	for j, v := range data {
+		res := result.Search(v)
 
-		// fmt.Printf("\n %v Found %f @ %d ", result, v, indx[i])
-		// 		if indx[i] < len(data) && data[i] == x {
-		// 	// x is present at data[i]
-		// } else {
-		// 	// x is not present in data,
-		// 	// but i is the index where it would be inserted.
-		// }
+		if indx[res] != -1 {
+			indx[res+1] = j
+		} else {
+			indx[res] = j
+		}
 
 	}
+
 	return VectorF(result), indx
 }
 
@@ -549,6 +617,43 @@ func StructNum2Strings(a interface{}) ([]string, error) {
 }
 
 // Internal utility to convert a struct into array of strings
+func Struct2String(a interface{}) (string, error) {
+	if reflect.TypeOf(a).Kind() != reflect.Struct {
+		return "", errors.New("Input Data not of Type Struct")
+	}
+
+	mvalue := reflect.ValueOf(a)
+	mtype := reflect.TypeOf(a)
+	var result []string = make([]string, 0, mtype.NumField())
+	cnt := 0
+	for i := 0; i < mtype.NumField(); i++ {
+		// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+		if mvalue.Field(i).CanInterface() && mtype.Field(i).Type.Kind() != reflect.Slice {
+
+			if mtype.Field(i).Type.Kind() == reflect.Struct {
+				// emstruct := reflect.ValueOf(a).Field(i)
+				strs, err := Struct2String(mvalue.Field(i).Interface())
+				_ = err
+				result = append(result, strs)
+			} else {
+				result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+			}
+
+			cnt++
+		}
+	}
+	return strings.Join(result, ","), nil
+}
+
+// Internal utility to convert a struct into a single string
+func Struct2HeaderLine(a interface{}) (string, error) {
+
+	results, error := Struct2Header(a)
+	result := strings.Join(results, ",")
+	return result, error
+}
+
+// Internal utility to convert a struct into array of strings
 func Struct2Strings(a interface{}) ([]string, error) {
 	if reflect.TypeOf(a).Kind() != reflect.Struct {
 		return nil, errors.New("Input Data not of Type Struct")
@@ -561,7 +666,18 @@ func Struct2Strings(a interface{}) ([]string, error) {
 	for i := 0; i < mtype.NumField(); i++ {
 		// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
 		if mvalue.Field(i).CanInterface() && mtype.Field(i).Type.Kind() != reflect.Slice {
-			result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+
+			if mtype.Field(i).Type.Kind() == reflect.Struct {
+				// emstruct := reflect.ValueOf(a).Field(i)
+				strs, err := Struct2Strings(mvalue.Field(i).Interface())
+				_ = err
+				result = append(result, strs...)
+			} else {
+				// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+				// result = append(result, mtype.Field(i).Name)
+				result = append(result, fmt.Sprintf("%v", mvalue.Field(i).Interface()))
+			}
+
 			cnt++
 		}
 	}
@@ -575,14 +691,27 @@ func Struct2Header(a interface{}) ([]string, error) {
 	}
 
 	mtype := reflect.TypeOf(a)
-	var result []string = make([]string, 0, mtype.NumField())
+	// Expand embeded struct
+
+	//
+
+	var result []string //  = make([]string, 0, mtype.NumField())
 	cnt := 0
 
 	for i := 0; i < mtype.NumField(); i++ {
 		if mtype.Field(i).PkgPath == "" && mtype.Field(i).Type.Kind() != reflect.Slice {
-			// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
-			result = append(result, mtype.Field(i).Name)
+			if mtype.Field(i).Type.Kind() == reflect.Struct {
+				emstruct := reflect.ValueOf(a).Field(i)
+				strs, err := Struct2Header(emstruct.Interface())
+				_ = err
+				result = append(result, strs...)
+			} else {
+				// fmt.Println("Kind of field ", mtype.Field(i).Type.Kind())
+				result = append(result, mtype.Field(i).Name)
+
+			}
 			cnt++
+
 		}
 	}
 	return result, nil
