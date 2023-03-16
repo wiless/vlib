@@ -66,6 +66,15 @@ func Location3DtoVecC(locs []Location3D) VectorC {
 	return result
 }
 
+func VecCLocation3D(locs VectorC) []Location3D {
+
+	result := make([]Location3D, len(locs))
+	for indx, val := range locs {
+		result[indx] = FromCmplx(val)
+	}
+	return result
+}
+
 func FromCmplx(val complex128) Location3D {
 	return Location3D{real(val), imag(val), 0}
 }
@@ -87,6 +96,18 @@ func (l *Location3D) Distance2DFrom(src Location3D) float64 {
 	sum := math.Pow(l.X-src.X, 2)
 	sum += math.Pow(l.Y-src.Y, 2)
 	return math.Sqrt(sum)
+}
+
+func (l *Location3D) AzimuthDir(dest Location3D) float64 {
+	dscan := math.Atan2(dest.Y-l.Y, dest.X-l.X)
+	return dscan
+}
+
+func (l *Location3D) DownTilt(dest Location3D) float64 {
+
+	d2d := l.Distance2DFrom(dest)
+	dtilt := math.Atan2(l.Z-dest.Z, d2d)
+	return dtilt
 }
 
 func (l *Location3D) DistanceFrom(src Location3D) float64 {

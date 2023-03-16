@@ -554,11 +554,12 @@ func Sorted(data VectorF) (values VectorF, indx VectorI) {
 	indx.Fill(-1)
 	for j, v := range data {
 		res := result.Search(v)
-
-		if indx[res] != -1 {
-			indx[res+1] = j
-		} else {
-			indx[res] = j
+		if res < len(indx) {
+			if indx[res] != -1 {
+				indx[res+1] = j
+			} else {
+				indx[res] = j
+			}
 		}
 
 	}
